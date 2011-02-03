@@ -71,6 +71,8 @@
   :components  ((:module "test"
 		 :components ((:file "package")
 			      (:file "location"
+			       :depends-on ("package"))
+			      (:file "macros"
 			       :depends-on ("package")))))
   :in-order-to ((test-op (load-op :cxml-location-test))))
 
