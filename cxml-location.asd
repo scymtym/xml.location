@@ -78,3 +78,16 @@
 
 (defmethod perform ((this test-op) (component (eql (find-system :cxml-location-test))))
   (funcall (find-symbol "RUN-TESTS" :lift) :config :generic))
+
+(defsystem-connection :cxml-location-and-local-time
+  :author      "Jan Moringen <jmoringe@techfak.uni-bielefeld.de>"
+  :maintainer  "Jan Moringen <jmoringe@techfak.uni-bielefeld.de>"
+  :version     "0.1.0"
+  :license     "GPL3"
+  :description "To and from XML conversion for local-time timestamps."
+  :requires    (xml-location
+	        local-time)
+  :components  ((:module "src"
+		 :components ((:file "package")
+			      (:file "local-time"
+			       :depends-on ("package"))))))
