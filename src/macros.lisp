@@ -50,9 +50,7 @@ the cxml-location package can be used."
 			 ((:values name access-form)
 			  (%parse-access-spec access-spec
 					      :location-var location-var)))
-		    (collect `(,location-var
-			       (loc ,document ,path
-				    ,@(remove-from-plist args :type)))
+		    (collect `(,location-var (loc ,document ,path ,@args))
 		      :into locations)
 		    (collect `(,name ,access-form) :into places))
 		  (finally (return (values locations places))))))
