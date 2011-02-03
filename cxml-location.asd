@@ -55,7 +55,9 @@
 			       :depends-on ("package" "conditions"
 					    "protocol" "location"
 					    "singleton-location"
-					    "multi-location")))))
+					    "multi-location"))
+			      (:file "macros"
+			       :depends-on ("package" "protocol")))))
   :in-order-to ((test-op (test-op :cxml-location-test))))
 
 (defsystem :cxml-location-test

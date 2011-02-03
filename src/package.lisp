@@ -59,6 +59,10 @@
    :location
    :singleton-location :multi-location)
 
+  ;; Macros
+  (:export
+   :with-locations)
+
   (:documentation
    "This package contains the public interface of the cmxl-location
 system. The main entry point is the generic function `loc', which
