@@ -60,4 +60,8 @@
    :singleton-location :multi-location)
 
   (:documentation
-   "TODO"))
+   "This package contains the public interface of the cmxl-location
+system. The main entry point is the generic function `loc', which
+creates `location' instances from XML documents and XPaths. The
+resulting objects can be queried and modified using the location-*
+accessors and the generic functions `name', `val' and `@'."))
