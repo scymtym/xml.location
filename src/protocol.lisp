@@ -89,6 +89,20 @@ performed prior to assigning the value. LOCATION has to represent an
 element node."))
 
 
+;;; Dynamic Location Class Family
+;;
+
+(define-dynamic-class-family location
+    "This dynamic class family consists of all location classes. A
+location class has the class `location' and a possibly several mixin
+classes as its superclasses. Typical location mixin classes are:
++ `singleton-location'
++ `multi-location'
++ `create-missing-nodes-mixin'
++ `ignore-empty-results-mixin'"
+  (:common-superclasses (location)))
+
+
 ;;; Location Construction Protocol
 ;;
 

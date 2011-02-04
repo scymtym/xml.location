@@ -35,7 +35,8 @@
 		:metabang-bind
 		:split-sequence
 		:cxml-stp
-		:xpath)
+		:xpath
+		:cl-dynamic-classes)
   :components  ((:module "src"
 		 :components ((:file "package")
 			      (:file "conditions"

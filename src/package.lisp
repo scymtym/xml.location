@@ -25,7 +25,8 @@
    :alexandria
    :iter
    :bind
-   :split-sequence)
+   :split-sequence
+   :dynamic-classes)
 
   ;; Special Symbols
   (:export
@@ -45,6 +46,12 @@
    :location-path
    :location-result
    :name :val :@)
+
+  ;; Dynamic Location Classes
+  (:export
+   :make-location-class
+   :ensure-location-class
+   :location-classes)
 
   ;; Location Construction Protocol
   (:export

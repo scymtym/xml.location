@@ -19,21 +19,33 @@
 
 (in-package :cxml-location)
 
-(defmethod loc ((document stp:node) (path t)
+(defmethod loc ((document stp:node) (path string)
 		&rest args
 		&key
-		if-multiple-matches
+		(if-multiple-matches :error)
 		if-no-match
 		&allow-other-keys)
-  (bind (((class args) (cond
-			 ((eq if-no-match :create)
-			  (error ":create is not supported, yet."))
-			 ((eq if-multiple-matches :all)
-			  `(multi-location
-			    ,(remove-from-plist args :if-multiple-matches)))
-			 (t
-			  `(singleton-location ,args)))))
-    (apply #'make-instance class
+  "Create a location for DOCUMENT and PATH. The class of the location
+instance is determined based on the values of IF-MULTIPLE-MATCHES and
+IF-NO-MATCH."
+  (let ((mixins))
+    ;; No match policy
+    (when if-no-match
+      (ecase if-no-match
+	(:create
+	 (push 'create-missing-nodes-mixin mixins))
+	((:error :do-nothing))))
+
+    ;; Multiple matches policy
+    (case if-multiple-matches
+      ((:error :first :last :any)
+       (push 'singleton-location mixins))
+      (:all
+       (push 'multi-location mixins)
+       (remove-from-plistf args :if-multiple-matches :if-no-match)))
+
+    ;; Create the location instance
+    (apply #'make-instance (ensure-location-class mixins)
 	   :document document
 	   :path     path
 	   args)))
