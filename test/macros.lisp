@@ -20,7 +20,8 @@
 (in-package :cxml-location.test)
 
 (deftestsuite macros-root (root)
-  ()
+  ((simple-document (cxml:parse "<bla foo='1 2 4' BAR='baz'>foo</bla>"
+				(stp:make-builder))))
   (:documentation
    "Unit tests for the `with-locations' macro."))
 
@@ -29,31 +30,30 @@
 	  "Smoke test for the `with-locations' macro.")
   smoke
 
-  (let ((document (cxml:parse "<bla foo='1 2 4' BAR='baz'>foo</bla>" (stp:make-builder))))
-    (with-locations (((:name name)                          "node()")
-		     (text                                  "bla/text()")
-		     ((:@ (foo "foo") :type '(list number)) "node()")
-		     ((@ bar)                               "node()"))
-	document
-      ;; Extract values from generalized variables
-      (ensure-same name "bla"
-		   :test #'string=)
-      (ensure-same foo '(1 2 4)
-		   :test #'equal)
-      (ensure-same bar "baz"
-		   :test #'string=)
-      (ensure-same text "foo"
-		   :test #'string=)
+  (with-locations (((:name name)                          "node()")
+		   (text                                  "bla/text()")
+		   ((:@ (foo "foo") :type '(list number)) "node()")
+		   ((@ bar)                               "node()"))
+      simple-document
+    ;; Extract values from generalized variables
+    (ensure-same name "bla"
+		 :test #'string=)
+    (ensure-same foo '(1 2 4)
+		 :test #'equal)
+    (ensure-same bar "baz"
+		 :test #'string=)
+    (ensure-same text "foo"
+		 :test #'string=)
 
-      ;; Set values of generalized variables
-      (setf name "frooble"
-	    foo  '(5 6)
-	    bar  42
-	    text "bubba"))
-    (ensure-same
-     (with-output-to-string (stream)
-       (stp:serialize document
-		      (cxml:make-character-stream-sink
-		       stream :omit-xml-declaration-p t)))
-     "<frooble foo=\"5 6\" BAR=\"42\">bubba</frooble>"
-     :test #'string=)))
+    ;; Set values of generalized variables
+    (setf name "frooble"
+	  foo  '(5 6)
+	  bar  42
+	  text "bubba"))
+  (ensure-same
+   (with-output-to-string (stream)
+     (stp:serialize simple-document
+		    (cxml:make-character-stream-sink
+		     stream :omit-xml-declaration-p t)))
+   "<frooble foo=\"5 6\" BAR=\"42\">bubba</frooble>"
+   :test #'string=))
