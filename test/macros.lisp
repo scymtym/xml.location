@@ -1,4 +1,4 @@
-;;; macros.lisp ---
+;;; macros.lisp --- Unit tests for the `with-locations' macro.
 ;;
 ;; Copyright (C) 2011 Jan Moringen
 ;;
@@ -36,22 +36,14 @@
 		     ((@ bar)                               "node()"))
 	document
       ;; Extract values from generalized variables
-      (ensure-same
-       name
-       "bla"
-       :test #'string=)
-      (ensure-same
-       foo
-       '(1 2 4)
-       :test #'equal)
-      (ensure-same
-       bar
-       "baz"
-       :test #'string=)
-      (ensure-same
-       text
-       "foo"
-       :test #'string=)
+      (ensure-same name "bla"
+		   :test #'string=)
+      (ensure-same foo '(1 2 4)
+		   :test #'equal)
+      (ensure-same bar "baz"
+		   :test #'string=)
+      (ensure-same text "foo"
+		   :test #'string=)
 
       ;; Set values of generalized variables
       (setf name "frooble"
