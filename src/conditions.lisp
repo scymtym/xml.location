@@ -89,6 +89,42 @@ had."))
 set that consists of multiple elements in a context that permits at
 most one element."))
 
+(define-condition invalid-binding-form (error)
+  ((form :initarg  :form
+	 :reader   invalid-binding-form-form
+	 :documentation
+	 "The invalid binding form."))
+  (:report
+   (lambda (condition stream)
+     (format stream "~@<The binding form ~A is invalid.~@:>"
+	     (invalid-binding-form-form condition))))
+  (:documentation
+   "This error is signaled when an invalid binding form is encountered
+during expansion of the `with-locations' macro."))
+
+(define-condition no-such-accessor-form (invalid-binding-form)
+  ((spec :initarg  :spec
+	 :reader   invalid-binding-form-spec
+	 :documentation
+	 "The accessor specification which contains the unknown
+accessor.")
+   (name :initarg  :name
+	 :reader   invalid-binding-form-name
+	 :documentation
+	 "The unknown accessor."))
+  (:report
+   (lambda (condition stream)
+     (format stream "~@<When expanding the binding form ~A containing ~
+the accessor specification ~A, the specified accessor ~S is not ~
+known.~@:>"
+	     (invalid-binding-form-form condition)
+	     (invalid-binding-form-spec condition)
+	     (invalid-binding-form-name condition))))
+  (:documentation
+   "This error is signaled if a binding form is encountered within a
+use of in the `with-locations' macro which contains an unknown
+accessor."))
+
 
 ;;; Utility Functions
 ;;

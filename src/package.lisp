@@ -37,7 +37,12 @@
    :location-error
    :result-set-error-mixin
    :empty-result-set
-   :too-many-matches-in-result-set)
+   :too-many-matches-in-result-set
+   :invalid-binding-form
+   :invalid-binding-form-form
+   :no-such-accessor-form
+   :invalid-binding-form-spec
+   :invalid-binding-form-name)
 
   ;; Location Protocol
   (:export

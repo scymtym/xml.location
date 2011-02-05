@@ -65,17 +65,32 @@ the cxml-location package can be used."
 (defgeneric %parse-access-spec (spec &rest args
 				&key &allow-other-keys))
 
+(defmethod %parse-access-spec ((spec t)
+			       &key
+			       inner-specs)
+  (%signal-no-such-accessor-form spec inner-specs))
+
+(defmethod %parse-access-spec ((spec (eql nil))
+			       &key
+			       inner-specs)
+  (%signal-no-such-accessor-form spec inner-specs))
+
 (defmethod %parse-access-spec ((spec list)
 			       &rest args)
-  (apply #'%parse-access-spec (first spec)
-	 :inner-specs (rest spec)
-	 args))
+  (if (not (symbolp (first spec)))
+      (call-next-method)
+      (apply #'%parse-access-spec
+	     (intern (string (first spec)) :keyword)
+	     :inner-specs (rest spec)
+	     args)))
 
 (defmethod %parse-access-spec ((spec symbol)
 			       &rest args)
-  (apply #'%parse-access-spec :val
-	 :inner-specs `(,spec)
-	 args))
+  (if (keywordp spec)
+      (call-next-method)
+      (apply #'%parse-access-spec :val
+	     :inner-specs `(,spec)
+	     args)))
 
 (defmethod %parse-access-spec ((spec (eql :name))
 			       &key
@@ -122,3 +137,13 @@ the cxml-location package can be used."
 (defmethod %parse-access-spec ((spec (eql '@))
 			       &rest args)
   (apply #'%parse-access-spec :@ args))
+
+
+;;; Utility Functions
+;;
+
+(defun %signal-no-such-accessor-form (spec args)
+  (error 'no-such-accessor-form
+	 :form `((,spec ,@args) "<path>")
+	 :spec `(,spec ,@args)
+	 :name spec))

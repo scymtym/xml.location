@@ -57,3 +57,20 @@
 		     stream :omit-xml-declaration-p t)))
    "<frooble foo=\"5 6\" BAR=\"42\">bubba</frooble>"
    :test #'string=))
+
+(addtest (macros-root
+          :documentation
+	  "Unit test for conditions that should be signaled by
+`with-locations'.")
+  conditions
+
+  (ensure-condition 'no-such-accessor-form
+    (macroexpand '(with-locations ((() "p")) simple-document)))
+  (ensure-condition 'no-such-accessor-form
+    (macroexpand '(with-locations (((foo) "p")) simple-document)))
+  (ensure-condition 'no-such-accessor-form
+    (macroexpand '(with-locations (((foo bar) "p")) simple-document)))
+  (ensure-condition 'no-such-accessor-form
+    (macroexpand '(with-locations (((:foo) "p")) simple-document)))
+  (ensure-condition 'no-such-accessor-form
+    (macroexpand '(with-locations (((:foo bar :baz 1) "p")) simple-document))))
