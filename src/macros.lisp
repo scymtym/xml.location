@@ -146,9 +146,11 @@ and ARGS. Return two values:
 			       location-var
 			       inner-specs)
   (bind (((name-spec &key type) inner-specs)
-	 ((name attribute-name) (if (listp name-spec)
-				    name-spec
-				    (list name-spec (string name-spec)))))
+	 ((name attribute-name)
+	  (if (listp name-spec)
+	      name-spec
+	      (list name-spec
+		    (string-downcase (string name-spec))))))
     (values
      name
      `(@ ,location-var ,attribute-name

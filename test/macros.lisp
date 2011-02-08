@@ -20,7 +20,7 @@
 (in-package :cxml-location.test)
 
 (deftestsuite macros-root (root)
-  ((simple-document (cxml:parse "<bla foo='1 2 4' BAR='baz'>foo</bla>"
+  ((simple-document (cxml:parse "<bla foo='1 2 4' bar='baz'>foo</bla>"
 				(stp:make-builder))))
   (:documentation
    "Unit tests for the `with-locations' macro."))
@@ -55,7 +55,7 @@
      (stp:serialize simple-document
 		    (cxml:make-character-stream-sink
 		     stream :omit-xml-declaration-p t)))
-   "<frooble foo=\"5 6\" BAR=\"42\">bubba</frooble>"
+   "<frooble foo=\"5 6\" bar=\"42\">bubba</frooble>"
    :test #'string=))
 
 (addtest (macros-root
