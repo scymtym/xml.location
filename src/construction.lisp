@@ -29,13 +29,6 @@
 instance is determined based on the values of IF-MULTIPLE-MATCHES and
 IF-NO-MATCH."
   (let ((mixins))
-    ;; No match policy
-    (when if-no-match
-      (ecase if-no-match
-	(:create
-	 (push 'create-missing-nodes-mixin mixins))
-	((:error :do-nothing))))
-
     ;; Multiple matches policy
     (case if-multiple-matches
       ((:error :first :last :any)
@@ -43,6 +36,13 @@ IF-NO-MATCH."
       (:all
        (push 'multi-location mixins)
        (remove-from-plistf args :if-multiple-matches :if-no-match)))
+
+    ;; No match policy
+    (when if-no-match
+      (ecase if-no-match
+	(:create
+	 (push 'create-missing-nodes-mixin mixins))
+	((:error :do-nothing))))
 
     ;; Create the location instance
     (apply #'make-instance (ensure-location-class mixins)
