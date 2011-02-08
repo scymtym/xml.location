@@ -46,17 +46,38 @@ the cxml-location package can be used."
     (bind (((:values locations places)
 	    (iter (for spec in bindings)
 		  (bind (((access-spec path &rest args) spec)
-			 (location-var (gensym "LOCATION"))
+			 ((:values location-var location-form)
+			  (%make-location-form document path args))
 			 ((:values name access-form)
 			  (%parse-access-spec access-spec
 					      :location-var location-var)))
-		    (collect `(,location-var (loc ,document ,path ,@args))
-		      :into locations)
+
+		    ;; Collect location construction form.
+		    (collect location-form :into locations)
+
+		    ;; Collect symbol-macrolet form.
 		    (collect `(,name ,access-form) :into places))
+
 		  (finally (return (values locations places))))))
       `(let ,locations
 	 (symbol-macrolet ,places
 	   ,@body)))))
+
+
+;;; Location Forms
+;;
+
+(defun %make-location-form (document path args)
+  "Make a form that creates the `location' instance for DOCUMENT, PATH
+and ARGS. Return two values:
++ a symbol for the variable that will hold the location instance
++ a form that should be evaluated to compute the location instance or
+  nil, if a location variable emitted earlier can be reused."
+  (let ((location-var (gensym "LOCATION")))
+    (values
+     location-var
+     `(,location-var
+       (loc ,document ,path ,@args)))))
 
 
 ;;; Access Spec Parser Methods
