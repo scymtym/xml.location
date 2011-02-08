@@ -62,7 +62,7 @@
 		  &key &allow-other-keys)
   "Catch-all method for STP nodes that have no obvious string
 interpretation."
-  (error "Cannot extract string from ~A node; Append /text() to XPath~
+  (error "Cannot extract string from ~A node; Append /text() to XPath ~
 if you intended to extract an element's text."
 	 (type-of value)))
 
@@ -113,7 +113,7 @@ if you intended to extract an element's text."
 
 (defmethod ->xml ((value string) (dest stp:node))
   "Catch-all for STP nodes that no obvious string interpretation."
-  (error "Cannot store string into ~A node; Append /text() to XPath if~
+  (error "Cannot store string into ~A node; Append /text() to XPath if ~
 you intended to write an element's text."
 	 (type-of dest)))
 
