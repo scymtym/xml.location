@@ -83,6 +83,8 @@
 			       :depends-on ("package"))
 			      (:file "macros"
 			       :depends-on ("package"))
+			      (:file "create-missing-nodes-mixin"
+			       :depends-on ("package"))
 			      (:file "local-time"
 			       :depends-on ("package")))))
   :in-order-to ((test-op (load-op :cxml-location-test))))

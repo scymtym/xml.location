@@ -22,6 +22,8 @@
 (defpackage :cxml-location.test
   (:use
    :cl
+   :alexandria
+   :iterate
    :lift
 
    :cxml-location)
