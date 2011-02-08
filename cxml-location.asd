@@ -91,7 +91,7 @@
   :version     "0.1.0"
   :license     "GPL3"
   :description "To and from XML conversion for local-time timestamps."
-  :requires    (xml-location
+  :requires    (cxml-location
 	        local-time)
   :components  ((:module "src"
 		 :components ((:file "package")
