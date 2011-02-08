@@ -44,28 +44,51 @@ Instead of the keywords :name, :val and :@ symbols of the same name in
 the cxml-location package can be used."
   (once-only (document)
     (bind (((:values locations places)
-	    (iter (for spec in bindings)
-		  (bind (((access-spec path &rest args) spec)
-			 ((:values location-var location-form)
-			  (%make-location-form document path args))
-			 ((:values name access-form)
-			  (%parse-access-spec access-spec
-					      :location-var location-var)))
-
-		    ;; Collect location construction form.
-		    (collect location-form :into locations)
-
-		    ;; Collect symbol-macrolet form.
-		    (collect `(,name ,access-form) :into places))
-
-		  (finally (return (values locations places))))))
+	    (%make-location-and-place-forms document bindings
+					    :writable? t)))
       `(let ,locations
 	 (symbol-macrolet ,places
 	   ,@body)))))
 
+(defmacro with-r/o-locations ((&rest bindings) document &body body)
+  "Like `with-locations', but binding places are not `setf'-able."
+  (once-only (document)
+    (bind (((:values locations places)
+	    (%make-location-and-place-forms document bindings)))
+      `(let* (,@locations
+	      ,@places)
+	 ,@body))))
+
 
-;;; Location Forms
+;;; Location and Place Forms
 ;;
+
+(defun %make-location-and-place-forms (document bindings
+				       &key
+				       writable?)
+  "Generate location and place forms for DOCUMENT and BINDINGS.
+When WRITABLE? is non-nil, locations are created in the document if
+necessary. Return two values:
++ A list of location forms
++ A list of place forms"
+  (iter (for spec in bindings)
+	(bind (((access-spec path &rest args) spec)
+	       ((:values location-var location-form)
+		(%make-location-form document path
+				     (append (when writable?
+					       `(:if-no-match :create))
+					     args)))
+	       ((:values name access-form)
+		(%parse-access-spec access-spec
+				    :location-var location-var)))
+
+	  ;; Collect location construction form.
+	  (collect location-form :into locations)
+
+	  ;; Collect symbol-macrolet form.
+	  (collect `(,name ,access-form) :into places))
+
+	(finally (return (values locations places)))))
 
 (defun %make-location-form (document path args)
   "Make a form that creates the `location' instance for DOCUMENT, PATH

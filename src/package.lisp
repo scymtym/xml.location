@@ -79,7 +79,7 @@
 
   ;; Macros
   (:export
-   :with-locations)
+   :with-locations :with-r/o-locations)
 
   (:documentation
    "This package contains the public interface of the cmxl-location

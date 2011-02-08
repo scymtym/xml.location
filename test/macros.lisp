@@ -64,13 +64,14 @@
 `with-locations'.")
   conditions
 
-  (ensure-condition 'no-such-accessor-form
-    (macroexpand '(with-locations ((() "p")) simple-document)))
-  (ensure-condition 'no-such-accessor-form
-    (macroexpand '(with-locations (((foo) "p")) simple-document)))
-  (ensure-condition 'no-such-accessor-form
-    (macroexpand '(with-locations (((foo bar) "p")) simple-document)))
-  (ensure-condition 'no-such-accessor-form
-    (macroexpand '(with-locations (((:foo) "p")) simple-document)))
-  (ensure-condition 'no-such-accessor-form
-    (macroexpand '(with-locations (((:foo bar :baz 1) "p")) simple-document))))
+  (iter (for macro in '(with-locations with-r/o-locations))
+	(ensure-condition 'no-such-accessor-form
+	  (macroexpand `(,macro ((() "p")) simple-document)))
+	(ensure-condition 'no-such-accessor-form
+	  (macroexpand `(,macro (((foo) "p")) simple-document)))
+	(ensure-condition 'no-such-accessor-form
+	  (macroexpand `(,macro (((foo bar) "p")) simple-document)))
+	(ensure-condition 'no-such-accessor-form
+	  (macroexpand `(,macro (((:foo) "p")) simple-document)))
+	(ensure-condition 'no-such-accessor-form
+	  (macroexpand `(,macro (((:foo bar :baz 1) "p")) simple-document)))))
