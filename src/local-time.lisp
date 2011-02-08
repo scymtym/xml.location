@@ -26,6 +26,6 @@
     (error "Serialized timestamp value ~S does not start with '@'"
 	   value))
 
-  (local-time:parse-timestring (subseq value 1)))
+  (local-time:parse-timestring (subseq value 1) :fail-on-error t))
 
 ;; we get ->xml for free via prin1ing in this case
