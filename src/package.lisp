@@ -42,7 +42,12 @@
    :invalid-binding-form-form
    :no-such-accessor-form
    :invalid-binding-form-spec
-   :invalid-binding-form-name)
+   :invalid-binding-form-name
+   :xpath-creation-error
+   :xpath-creation-error-location
+   :xpath-creation-error-type
+   :xpath-creation-error-name
+   :xpath-creation-error-predicate)
 
   ;; Location Protocol
   (:export
@@ -69,7 +74,8 @@
   ;; Location Classes
   (:export
    :location
-   :singleton-location :multi-location)
+   :singleton-location :multi-location
+   :create-missing-nodes-mixin)
 
   ;; Macros
   (:export

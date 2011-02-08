@@ -50,6 +50,8 @@
 			       :depends-on ("package" "location"))
 			      (:file "multi-location"
 			       :depends-on ("package" "location"))
+			      (:file "create-missing-nodes-mixin"
+			       :depends-on ("package" "location"))
 			      (:file "conversion"
 			       :depends-on ("package" "protocol"))
 			      (:file "construction"

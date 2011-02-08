@@ -125,6 +125,41 @@ known.~@:>"
 use of in the `with-locations' macro which contains an unknown
 accessor."))
 
+(define-condition xpath-creation-error (simple-error)
+  ((location  :initarg  :location
+	      :reader   xpath-creation-error-location
+	      :documentation
+	      "The location at which a node should have been added
+according to the XPath.")
+   (type      :initarg  :type
+	      :reader   xpath-creation-error-type
+	      :documentation
+	      "The type of the XPath fragment for which the creation
+of a node failed.")
+   (name      :initarg  :name
+	      :reader   xpath-creation-error-name
+	      :documentation
+	      "The name mentioned in the XPath fragment for which the
+creation of a node failed.")
+   (predicate :initarg  :predicate
+	      :reader   xpath-creation-error-predicate
+	      :documentation
+	      "The predicate of the XPath fragment for which the
+creation of a node failed."))
+  (:default-initargs :format-control   ""
+		     :format-arguments nil)
+  (:report
+   (lambda (condition stream)
+     (format stream "~@<Could create node for XPath fragment (~S ~S ~S) at location ~A~@:>"
+	     (xpath-creation-error-type      condition)
+	     (xpath-creation-error-name      condition)
+	     (xpath-creation-error-predicate condition)
+	     (xpath-creation-error-location  condition))
+     (%maybe-add-explanation condition stream)))
+  (:documentation
+   "This error is signaled when the creation of a node based on a
+XPath fragment fails."))
+
 
 ;;; Utility Functions
 ;;
@@ -136,3 +171,12 @@ CONDITION."
     (stp:serialize
      (location-error-document condition)
      (cxml:make-character-stream-sink stream))))
+
+(defun %maybe-add-explanation (condition stream)
+  "Format the message contained in the `simple-condition' CONDITION on
+STREAM."
+  (let ((control   (simple-condition-format-control   condition))
+	(arguments (simple-condition-format-arguments condition)))
+    (when (and (not (emptyp control)) arguments)
+      (format stream ": ~%")
+      (apply #'format stream control arguments))))
