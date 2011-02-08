@@ -71,24 +71,35 @@ When WRITABLE? is non-nil, locations are created in the document if
 necessary. Return two values:
 + A list of location forms
 + A list of place forms"
-  (iter (for spec in bindings)
-	(bind (((access-spec path &rest args) spec)
-	       ((:values location-var location-form)
-		(%make-location-form document path
-				     (append (when writable?
-					       `(:if-no-match :create))
-					     args)))
-	       ((:values name access-form)
-		(%parse-access-spec access-spec
-				    :location-var location-var)))
+  (let ((reusable-locations (make-hash-table :test #'equal)))
+    (iter (for spec in bindings)
+	  (bind (((access-spec path &rest args) spec)
+		 ((:flet make-location-form ())
+		  (multiple-value-list
+		   (%make-location-form document path
+					(append (when writable?
+						  `(:if-no-match :create))
+						args))))
+		 ((location-var &optional location-form)
+		  (cond
+		    ((not (constantp path))
+		     (make-location-form))
+		    ((butlast (gethash path reusable-locations)))
+		    (t
+		     (setf (gethash path reusable-locations)
+			   (make-location-form)))))
+		 ((:values name access-form)
+		  (%parse-access-spec access-spec
+				      :location-var location-var)))
 
-	  ;; Collect location construction form.
-	  (collect location-form :into locations)
+	    ;; Collect location construction form.
+	    (when location-form
+	      (collect location-form :into locations))
 
-	  ;; Collect symbol-macrolet form.
-	  (collect `(,name ,access-form) :into places))
+	    ;; Collect symbol-macrolet form.
+	    (collect `(,name ,access-form) :into places))
 
-	(finally (return (values locations places)))))
+	  (finally (return (values locations places))))))
 
 (defun %make-location-form (document path args)
   "Make a form that creates the `location' instance for DOCUMENT, PATH
