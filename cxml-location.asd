@@ -17,6 +17,9 @@
 ;; You should have received a copy of the GNU General Public License
 ;; along with this program. If not, see <http://www.gnu.org/licenses>.
 
+(when (asdf:find-system :asdf-system-connections)
+  (asdf:load-system :asdf-system-connections))
+
 (defpackage :cxml-location-system
   (:use
    :cl
@@ -85,6 +88,7 @@
 (defmethod perform ((this test-op) (component (eql (find-system :cxml-location-test))))
   (funcall (find-symbol "RUN-TESTS" :lift) :config :generic))
 
+#+asdf-system-connections
 (defsystem-connection :cxml-location-and-local-time
   :author      "Jan Moringen <jmoringe@techfak.uni-bielefeld.de>"
   :maintainer  "Jan Moringen <jmoringe@techfak.uni-bielefeld.de>"
