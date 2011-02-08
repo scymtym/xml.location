@@ -28,6 +28,36 @@
   "Create a location for DOCUMENT and PATH. The class of the location
 instance is determined based on the values of IF-MULTIPLE-MATCHES and
 IF-NO-MATCH."
+  ;; Create the location instance
+  (bind (((:values class args) (apply #'%compute-location-class args)))
+    (apply #'make-instance class
+	   :document document
+	   :path     path
+	   args)))
+
+(defmethod loc ((document string) (path t)
+		&rest args)
+  "Parse DOCUMENT as XML document before constructing the location."
+  (let ((document (cxml:parse document (stp:make-builder))))
+    (apply #'loc document path args)))
+
+(defmethod loc :around ((document t) (path function)
+			&rest args)
+  "Interpret PATH as compiled XPath, skipping the compilation step."
+  (apply #'loc document nil :compiled-path path args))
+
+
+;;; Utility Functions
+;;
+
+(defun %compute-location-class (&rest args
+				&key
+				(if-multiple-matches :error)
+				if-no-match
+				&allow-other-keys)
+  "Compute a location class based on the values of IF-MULTIPLE-MATCHES
+and IF-NO-MATCH. This is a separate function to make it usable in
+compiler macros."
   (let ((mixins))
     ;; Multiple matches policy
     (case if-multiple-matches
@@ -44,19 +74,4 @@ IF-NO-MATCH."
 	 (push 'create-missing-nodes-mixin mixins))
 	((:error :do-nothing))))
 
-    ;; Create the location instance
-    (apply #'make-instance (ensure-location-class mixins)
-	   :document document
-	   :path     path
-	   args)))
-
-(defmethod loc ((document string) (path t)
-		&rest args)
-  "Parse DOCUMENT as XML document before constructing the location."
-  (let ((document (cxml:parse document (stp:make-builder))))
-    (apply #'loc document path args)))
-
-(defmethod loc :around ((document t) (path function)
-			&rest args)
-  "Interpret PATH as compiled XPath, skipping the compilation step."
-  (apply #'loc document nil :compiled-path path args))
+    (values (ensure-location-class mixins) args)))
