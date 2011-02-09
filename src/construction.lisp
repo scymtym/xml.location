@@ -28,6 +28,9 @@
   "Create a location for DOCUMENT and PATH. The class of the location
 instance is determined based on the values of IF-MULTIPLE-MATCHES and
 IF-NO-MATCH."
+  ;; The keyword arguments are just there to document the interface.
+  (declare (ignore if-multiple-matches if-no-match))
+
   ;; Create the location instance
   (bind (((:values class args) (apply #'%compute-location-class args)))
     (apply #'make-instance class
