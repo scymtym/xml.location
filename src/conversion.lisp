@@ -118,6 +118,22 @@ text.~@:>"
 	 :destination dest
 	 :type        type))
 
+(defmethod ->xml :around ((value t) (dest t) (type (eql nil))
+			  &key &allow-other-keys)
+  (error '->xml-conversion-error
+	 :value            value
+	 :destination      dest
+	 :type             type
+	 :format-control   "~@<~S is not valid as a type specification.~@:>"
+	 :format-arguments `(,type)))
+
+(defmethod ->xml :around ((value t) (dest t) (type list)
+			  &key &allow-other-keys)
+  "Split composite type specification TYPE into head and tail."
+  (if (length= 1 type)
+      (->xml value dest (first type))
+      (->xml value dest (first type) :inner-types (rest type))))
+
 (defmethod ->xml ((value t) (dest stp:text) (type t)
 		  &key &allow-other-keys)
   "Convert VALUE to string and store in DEST."
