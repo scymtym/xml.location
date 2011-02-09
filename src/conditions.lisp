@@ -40,6 +40,10 @@ document ~A and XPATH ~A occurred.~@:>"
    "This condition class can be used to discriminate location-related
 errors."))
 
+
+;;; Result-set-related Errors
+;;
+
 (define-condition result-set-error-mixin (condition)
   ((result-set :initarg  :result-set
 	       :type     xpath:node-set
@@ -89,6 +93,10 @@ had."))
 set that consists of multiple elements in a context that permits at
 most one element."))
 
+
+;;; `with-locations'-related Errors
+;;
+
 (define-condition invalid-binding-form (error)
   ((form :initarg  :form
 	 :reader   invalid-binding-form-form
@@ -125,6 +133,10 @@ known.~@:>"
 use of in the `with-locations' macro which contains an unknown
 accessor."))
 
+
+;;; XPath-based Creation Errors
+;;
+
 (define-condition xpath-creation-error (simple-error)
   ((location  :initarg  :location
 	      :reader   xpath-creation-error-location
@@ -159,6 +171,10 @@ creation of a node failed."))
   (:documentation
    "This error is signaled when the creation of a node based on a
 XPath fragment fails."))
+
+
+;;; Conversion Errors
+;;
 
 (define-condition conversion-error (simple-error)
   ((value :initarg  :value
