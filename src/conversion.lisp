@@ -95,36 +95,46 @@ if you intended to extract an element's text."
 ;;; * -> XML Conversions
 ;;
 
-(defmethod ->xml ((value t) (dest stp:text))
+(defmethod ->xml ((value t) (dest stp:text) (type t)
+		  &key &allow-other-keys)
   "Convert VALUE to string and store in DEST."
-  (setf (stp:data dest) (->xml value 'string)))
+  (setf (stp:data dest) (->xml value nil 'string))
+  value)
 
-(defmethod ->xml ((value string) (dest stp:text))
+(defmethod ->xml ((value string) (dest stp:text) (type t)
+		  &key &allow-other-keys)
   "Fast-path method for storing string VALUE into text node DEST."
   (setf (stp:data dest) value))
 
-(defmethod ->xml ((value t) (dest stp:attribute))
+(defmethod ->xml ((value t) (dest stp:attribute) (type t)
+		  &key &allow-other-keys)
   "Convert VALUE to string and store in DEST."
-  (setf (stp:value dest) (->xml value 'string)))
+  (setf (stp:value dest) (->xml value nil 'string))
+  value)
 
-(defmethod ->xml ((value string) (dest stp:attribute))
+(defmethod ->xml ((value string) (dest stp:attribute) (type t)
+		  &key &allow-other-keys)
   "Fast-path method for storing string VALUE into text node DEST."
   (setf (stp:value dest) value))
 
-(defmethod ->xml ((value string) (dest stp:node))
+(defmethod ->xml ((value string) (dest stp:node) (type (eql 'string))
+		  &key &allow-other-keys)
   "Catch-all for STP nodes that no obvious string interpretation."
   (error "Cannot store string into ~A node; Append /text() to XPath if ~
 you intended to write an element's text."
 	 (type-of dest)))
 
-(defmethod ->xml ((value t) (dest (eql 'string)))
+(defmethod ->xml ((value t) (dest (eql nil)) (type (eql 'string))
+		  &key &allow-other-keys)
   "Convert VALUE to requested type string by `prin1'ing it."
   (prin1-to-string value))
 
-(defmethod ->xml ((value string) (dest (eql 'string)))
+(defmethod ->xml ((value string) (dest (eql nil)) (type (eql 'string))
+		  &key &allow-other-keys)
   "Fast-path method for string VALUE."
   value)
 
-(defmethod ->xml ((value sequence) (dest (eql 'string)))
+(defmethod ->xml ((value sequence) (dest (eql nil)) (type (eql 'string))
+		  &key &allow-other-keys)
   "Convert sequence VALUE to string by `format'ting."
   (format nil "~{~A~^ ~}" (coerce value 'list)))

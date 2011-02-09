@@ -98,10 +98,8 @@ XPath that produces exactly one match in the document."))
 (defmethod (setf val) ((new-value t)
 		       (location  singleton-location)
 		       &key
-		       (type 'string))
-  (declare (ignore type))
-
-  (->xml new-value (location-result location)))
+		       (type :any))
+  (->xml new-value (location-result location) type))
 
 (defmethod @ ((location singleton-location)
 	      (name     string)
@@ -114,9 +112,7 @@ XPath that produces exactly one match in the document."))
 		     (name      string)
 		     &key
 		     (type 'string))
-  (declare (ignore type))
-
-  (->xml new-value (location-attribute location name)))
+  (->xml new-value (location-attribute location name) type))
 
 (defmethod location-attribute :before ((location singleton-location)
 				       (name     string))

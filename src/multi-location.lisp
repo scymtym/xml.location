@@ -60,12 +60,10 @@ have a name")
 (defmethod (setf val) ((new-value t)
 		       (location  multi-location)
 		       &key
-		       (type 'string))
-  (declare (ignore type))
-
+		       (type :any))
   (xpath:map-node-set->list
-   (curry #'->xml new-value) (location-result location))
-  new-value)
+   #'(lambda (node) (->xml new-value node type))
+   (location-result location)))
 
 (defmethod @ ((location multi-location)
 	      (name     string)
@@ -79,11 +77,8 @@ have a name")
 		     (name      string)
 		     &key
 		     (type 'string))
-  (declare (ignore type))
-
-  (map 'list (curry #'->xml new-value)
-       (location-attribute location name))
-  new-value)
+  (map 'list #'(lambda (attr) (->xml new-value attr type))
+       (location-attribute location name)))
 
 (defmethod location-attribute ((location multi-location)
 			       (name     string))
