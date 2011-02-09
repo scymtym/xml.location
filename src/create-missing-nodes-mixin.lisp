@@ -31,8 +31,9 @@ classes."))
   (call-next-method)
   ;; After the instance has been constructed, immediately check
   ;; whether nodes have to be created in the document.
-  (create-xpath (location-document instance)
-		(location-path     instance)))
+  (let ((xpath::*dynamic-namespaces* (slot-value instance 'namespaces)))
+    (create-xpath (location-document instance)
+		  (location-path     instance))))
 
 (defmethod location-attribute ((location create-missing-nodes-mixin)
 			       (name     string))
@@ -92,6 +93,12 @@ are encountered. "
 				  (predicate t))
   (%create-xpath-element location type "somenode" predicate))
 
+(defmethod %create-xpath-element ((location  stp:element)
+				  (type      (eql :child))
+				  (name      (eql '*))
+				  (predicate t))
+  (%create-xpath-element location type "somenode" predicate))
+
 (defmethod %create-xpath-element :around ((location  stp:element)
 					  (type      (eql :child))
 					  (name      t)
@@ -113,6 +120,25 @@ are encountered. "
   (let ((child (stp:make-element name)))
     (stp:append-child location child)
     (list child)))
+
+(defmethod %create-xpath-element ((location  stp:element)
+				  (type      (eql :child))
+				  (name      list)
+				  (predicate (eql nil)))
+  (bind (((marker prefix local-name) name))
+    (unless (eq marker :qname)
+      (error 'xpath-creation-error
+	     :location         location
+	     :type             type
+	     :name             name
+	     :predicate        predicate
+	     :format-control   "~@<Invalid marker in qualified name component list: ~S.~@:>"
+	     :format-arguments `(,marker)))
+    (let ((child (stp:make-element
+		  (concatenate 'string prefix ":" local-name)
+		  (xpath::find-dynamic-namespace prefix))))
+      (stp:append-child location child)
+      (list child))))
 
 (defmethod %create-xpath-element ((location  stp:element)
 				  (type      (eql :attribute))
