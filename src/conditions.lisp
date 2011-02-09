@@ -160,6 +160,109 @@ creation of a node failed."))
    "This error is signaled when the creation of a node based on a
 XPath fragment fails."))
 
+(define-condition conversion-error (simple-error)
+  ((value :initarg  :value
+	  :type     t
+	  :reader   conversion-error-value
+	  :documentation
+	  "The value for which the conversion failed.")
+   (type  :initarg  :type
+	  :type     t
+	  :reader   conversion-error-type
+	  :documentation
+	  "The type involved in the failed conversion."))
+  (:default-initargs :format-control   ""
+    :format-arguments nil)
+  (:report
+   (lambda (condition stream)
+     (format stream "~@<Conversion failed for value ~S and type ~S~@:>"
+	     (conversion-error-value condition)
+	     (conversion-error-type  condition))))
+  (:documentation
+   "This error is signaled when a conversion fails."))
+
+(define-condition no-conversion-method-mixin (condition)
+  ((function :initarg    :function
+	     :type       symbol
+	     :allocation :class
+	     :reader     conversion-error-function
+	     :documentation
+	     "The name of the conversion function for which no
+suitable method could be found."))
+  (:documentation
+   "This condition class can be mixed into condition classes that
+indicate a conversion failure because of a missing conversion
+method."))
+
+(defmethod add-available-conversion-methods ((condition no-conversion-method-mixin)
+					     (stream    t))
+  "Print a list of methods of the generic function associated to
+CONDITION onto STREAM."
+  (format stream "~%TODO: enumerate available methods here."))
+
+(define-condition xml->-conversion-error (conversion-error)
+  ()
+  (:report
+   (lambda (condition stream)
+     (format stream "~@<The XML node ~S could not be converted into a ~
+Lisp object with type ~S.~@:>"
+	     (conversion-error-value condition)
+	     (conversion-error-type  condition))
+     (%maybe-add-explanation condition stream)))
+  (:documentation
+   "This error is signaled when converting an XML location into a Lisp
+object with a certain type fails."))
+
+(define-condition no-xml->-conversion-method (xml->-conversion-error
+					      no-conversion-method-mixin)
+  ((function :initform 'xml->))
+  (:report
+   (lambda (condition stream)
+     (format stream "~@<There is no method on ~S to convert the XML ~
+node ~S into a Lisp object with type ~S.~@:>"
+	     (conversion-error-function condition)
+	     (conversion-error-value    condition)
+	     (conversion-error-type     condition))
+     (add-available-conversion-methods condition stream)))
+  (:documentation
+   "This error is signaled when no method is available to convert an
+XML location into a Lisp object with a certain type."))
+
+(define-condition ->xml-conversion-error (conversion-error)
+  ((destination :initarg  :destination
+		:type     t
+		:reader   conversion-error-destination
+		:documentation
+		"The destination of the failed conversion. Usually an
+XML node."))
+  (:report
+   (lambda (condition stream)
+     (format stream "~@<The value ~S could not be stored in the ~
+destination ~S with type ~S.~@:>"
+	     (conversion-error-value       condition)
+	     (conversion-error-destination condition)
+	     (conversion-error-type        condition))
+     (%maybe-add-explanation condition stream)))
+  (:documentation
+   "This error is signaled when storing a value into an XML location
+with a certain type fails."))
+
+(define-condition no-->xml-conversion-method (->xml-conversion-error
+					      no-conversion-method-mixin)
+  ((function :initform '->xml))
+  (:report
+   (lambda (condition stream)
+     (format stream "~@<There is no method on ~S to store the value ~S ~
+in the destination ~S with type ~S.~@:>"
+	     (conversion-error-function    condition)
+	     (conversion-error-value       condition)
+	     (conversion-error-destination condition)
+	     (conversion-error-type        condition))
+     (add-available-conversion-methods condition stream)))
+  (:documentation
+   "This error is signaled when no method is available to store a
+value into an XML location with a certain type."))
+
 
 ;;; Utility Functions
 ;;
