@@ -23,9 +23,20 @@
 ;;; XML -> * Conversions
 ;;
 
+(defmethod xml-> ((value t) (type t)
+		  &key &allow-other-keys)
+  "Catch-all method to signal a conversion error."
+  (error 'no-xml->-conversion-method
+	 :value            value
+	 :type             type))
+
 (defmethod xml-> :around ((value t) (type (eql nil))
 			  &key &allow-other-keys)
-  (error "NIL is not valid as a type specification."))
+  (error 'xml->-conversion-error
+	 :value            value
+	 :type             type
+	 :format-control   "~@<~S is not valid as a type specification.~@:>"
+	 :format-arguments `(,type)))
 
 (defmethod xml-> :around ((value t) (type list)
 			  &key &allow-other-keys)
@@ -62,9 +73,13 @@
 		  &key &allow-other-keys)
   "Catch-all method for STP nodes that have no obvious string
 interpretation."
-  (error "Cannot extract string from ~A node; Append /text() to XPath ~
-if you intended to extract an element's text."
-	 (type-of value)))
+  (error 'xml->-conversion-error
+	 :value            value
+	 :type             type
+	 :format-control   "~@<Cannot extract a string from a ~A node; ~
+Append /text() to the XPath if you intended to extract an element's ~
+text.~@:>"
+	 :format-arguments `(,(type-of value))))
 
 (defmethod xml-> ((value string) (type t)
 		  &key &allow-other-keys)
@@ -95,6 +110,14 @@ if you intended to extract an element's text."
 ;;; * -> XML Conversions
 ;;
 
+(defmethod ->xml ((value t) (dest t) (type t)
+		  &key &allow-other-keys)
+  "Catch-all method to signal a conversion error."
+  (error 'no-->xml-conversion-method
+	 :value       value
+	 :destination dest
+	 :type        type))
+
 (defmethod ->xml ((value t) (dest stp:text) (type t)
 		  &key &allow-other-keys)
   "Convert VALUE to string and store in DEST."
@@ -120,9 +143,14 @@ if you intended to extract an element's text."
 (defmethod ->xml ((value string) (dest stp:node) (type (eql 'string))
 		  &key &allow-other-keys)
   "Catch-all for STP nodes that no obvious string interpretation."
-  (error "Cannot store string into ~A node; Append /text() to XPath if ~
-you intended to write an element's text."
-	 (type-of dest)))
+  (error '->xml-conversion-error
+	 :value            value
+	 :destination      dest
+	 :type             type
+	 :format-control   "~@<Cannot store a string into an ~A node; ~
+Append /text() to the XPath if you intended to write an element's ~
+text.~@:>"
+	 :format-arguments `(,(type-of dest))))
 
 (defmethod ->xml ((value t) (dest (eql nil)) (type (eql 'string))
 		  &key &allow-other-keys)
