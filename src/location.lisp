@@ -62,10 +62,15 @@ resulting from evaluating the XPath on the document as a concrete
 representation of this relation. Operation on the location are carried
 out on the node or nodes of the node set."))
 
+(defmethod initialize-instance ((instance location)
+				&key)
+  (call-next-method)
+  ;; Augment the list of namespaces if necessary. We do this as early
+  ;; as possible.
+  (%maybe-add-default-namespaces instance))
+
 (defmethod initialize-instance :after ((instance location)
 				       &key)
-  ;; Augment the list of namespaces if necessary.
-  (%maybe-add-default-namespaces instance)
   ;; Compile and evaluate the XPath (compilation is not necessary if a
   ;; compiled XPath has been provided).
   (unless (slot-value instance 'compiled-path)
