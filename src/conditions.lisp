@@ -205,7 +205,7 @@ CONDITION onto STREAM."
   (:report
    (lambda (condition stream)
      (format stream "~@<The XML node ~S could not be converted into a ~
-Lisp object with type ~S.~@:>"
+Lisp object with type ~S~@:>"
 	     (conversion-error-value condition)
 	     (conversion-error-type  condition))
      (%maybe-add-explanation condition stream)))
@@ -238,7 +238,7 @@ XML node."))
   (:report
    (lambda (condition stream)
      (format stream "~@<The value ~S could not be stored in the ~
-destination ~S with type ~S.~@:>"
+destination ~S with type ~S~@:>"
 	     (conversion-error-value       condition)
 	     (conversion-error-destination condition)
 	     (conversion-error-type        condition))
@@ -276,10 +276,12 @@ CONDITION."
      (cxml:make-character-stream-sink stream))))
 
 (defun %maybe-add-explanation (condition stream)
-  "Format the message contained in the `simple-condition' CONDITION on
-STREAM."
+  "If there is one, format the message contained in the
+`simple-condition' CONDITION on STREAM. Otherwise just add a colon."
   (let ((control   (simple-condition-format-control   condition))
 	(arguments (simple-condition-format-arguments condition)))
-    (when (and (not (emptyp control)) arguments)
-      (format stream ": ~%")
-      (apply #'format stream control arguments))))
+    (if (and (not (emptyp control)) arguments)
+	(progn
+	  (format stream ": ~%")
+	  (apply #'format stream control arguments))
+	(write-char #\. stream))))
