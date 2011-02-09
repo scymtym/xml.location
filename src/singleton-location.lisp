@@ -87,7 +87,8 @@ XPath that produces exactly one match in the document."))
 	(bind (((prefix local-name) (split-sequence #\: new-value)))
 	  (setf (stp:namespace-prefix item) prefix
 		(stp:local-name item)       local-name))
-	(setf (stp:local-name item) new-value))))
+	(setf (stp:local-name item) new-value)))
+  new-value)
 
 (defmethod val ((location singleton-location)
 		&key

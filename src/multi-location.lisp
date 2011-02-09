@@ -48,7 +48,8 @@ have a name")
 			     (setf (stp:namespace-prefix item) prefix
 				   (stp:local-name item)       local-name)))
 		       #'(lambda (item) (setf (stp:local-name item) new-value)))))
-    (xpath:map-node-set->list set-name (location-result location))))
+    (xpath:map-node-set->list set-name (location-result location)))
+  new-value)
 
 (defmethod val ((location multi-location)
 		&key
@@ -63,7 +64,8 @@ have a name")
   (declare (ignore type))
 
   (xpath:map-node-set->list
-   (curry #'->xml new-value) (location-result location)))
+   (curry #'->xml new-value) (location-result location))
+  new-value)
 
 (defmethod @ ((location multi-location)
 	      (name     string)
@@ -80,7 +82,8 @@ have a name")
   (declare (ignore type))
 
   (map 'list (curry #'->xml new-value)
-       (location-attribute location name)))
+       (location-attribute location name))
+  new-value)
 
 (defmethod location-attribute ((location multi-location)
 			       (name     string))
