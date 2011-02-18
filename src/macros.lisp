@@ -1,4 +1,4 @@
-;;; macros.lisp ---
+;;; macros.lisp --- Convenience macros for the cxml-location system.
 ;;
 ;; Copyright (C) 2011 Jan Moringen
 ;;
