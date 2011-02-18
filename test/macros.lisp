@@ -1,4 +1,4 @@
-;;; macros.lisp --- Unit tests for the `with-locations' macro.
+;;; macros.lisp --- Unit tests for the `with-locations' macros.
 ;;
 ;; Copyright (C) 2011 Jan Moringen
 ;;
@@ -23,11 +23,11 @@
   ((simple-document (cxml:parse "<bla foo='1 2 4' bar='baz'>foo</bla>"
 				(stp:make-builder))))
   (:documentation
-   "Unit tests for the `with-locations' macro."))
+   "Unit tests for the `with-locations' macros."))
 
 (addtest (macros-root
           :documentation
-	  "Smoke test for the `with-locations' macro.")
+	  "Smoke test for the `with-locations' macros.")
   smoke
 
   (with-locations (((:name name)                          "node()")
@@ -61,10 +61,10 @@
 (addtest (macros-root
           :documentation
 	  "Unit test for conditions that should be signaled by
-`with-locations'.")
+`with-locations' macros.")
   conditions
 
-  (iter (for macro in '(with-locations with-r/o-locations))
+  (iter (for macro in '(with-locations with-locations-r/o))
 	(ensure-condition 'no-such-accessor-form
 	  (macroexpand `(,macro ((() "p")) simple-document)))
 	(ensure-condition 'no-such-accessor-form

@@ -50,7 +50,7 @@ the cxml-location package can be used."
 	 (symbol-macrolet ,places
 	   ,@body)))))
 
-(defmacro with-r/o-locations ((&rest bindings) document &body body)
+(defmacro with-locations-r/o ((&rest bindings) document &body body)
   "Like `with-locations', but binding places are not `setf'-able."
   (once-only (document)
     (bind (((:values locations places)
