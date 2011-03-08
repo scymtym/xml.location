@@ -33,7 +33,7 @@
   :author      "Jan Moringen <jmoringe@techfak.uni-bielefeld.de>"
   :maintainer  "Jan Moringen <jmoringe@techfak.uni-bielefeld.de>"
   :version     "0.1.0"
-  :license     "GPL3"
+  :license     "GPL3; see COPYING file for details."
   :description "This system provides a convenient interface for
  manipulating XML data. It is inspired by the xmltio library."
   :depends-on  (:iterate
@@ -72,7 +72,7 @@
   :author      "Jan Moringen <jmoringe@techfak.uni-bielefeld.de>"
   :maintainer  "Jan Moringen <jmoringe@techfak.uni-bielefeld.de>"
   :version     "0.1.0"
-  :license     "GPL3"
+  :license     "GPL3; see COPYING file for details."
   :description "Unit tests for the cxml-location system."
   :depends-on  (:cxml-location
 		:lift
@@ -97,7 +97,7 @@
   :author      "Jan Moringen <jmoringe@techfak.uni-bielefeld.de>"
   :maintainer  "Jan Moringen <jmoringe@techfak.uni-bielefeld.de>"
   :version     "0.1.0"
-  :license     "GPL3"
+  :license     "GPL3; see COPYING file for details."
   :description "To and from XML conversion for local-time timestamps."
   :requires    (cxml-location
 	        local-time)
