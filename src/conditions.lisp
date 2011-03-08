@@ -210,12 +210,6 @@ suitable method could be found."))
 indicate a conversion failure because of a missing conversion
 method."))
 
-(defmethod add-available-conversion-methods ((condition no-conversion-method-mixin)
-					     (stream    t))
-  "Print a list of methods of the generic function associated to
-CONDITION onto STREAM."
-  (format stream "~%TODO: enumerate available methods here."))
-
 (define-condition xml->-conversion-error (conversion-error)
   ()
   (:report
@@ -239,7 +233,7 @@ node ~S into a Lisp object with type ~S.~@:>"
 	     (conversion-error-function condition)
 	     (conversion-error-value    condition)
 	     (conversion-error-type     condition))
-     (add-available-conversion-methods condition stream)))
+     (%add-available-conversion-methods condition stream)))
   (:documentation
    "This error is signaled when no method is available to convert an
 XML location into a Lisp object with a certain type."))
@@ -274,7 +268,7 @@ in the destination ~S with type ~S.~@:>"
 	     (conversion-error-value       condition)
 	     (conversion-error-destination condition)
 	     (conversion-error-type        condition))
-     (add-available-conversion-methods condition stream)))
+     (%add-available-conversion-methods condition stream)))
   (:documentation
    "This error is signaled when no method is available to store a
 value into an XML location with a certain type."))
@@ -301,3 +295,19 @@ CONDITION."
 	  (format stream ": ~%")
 	  (apply #'format stream control arguments))
 	(write-char #\. stream))))
+
+(defgeneric %add-available-conversion-methods (condition stream)
+  (:documentation
+   "Print a list of methods of the generic function associated to
+CONDITION onto STREAM."))
+
+(defmethod %add-available-conversion-methods ((condition no-->xml-conversion-method)
+					      (stream    t))
+
+  (format stream "~%TODO: enumerate available ->xml methods here."))
+
+(defmethod %add-available-conversion-methods ((condition no-xml->-conversion-method)
+					      (stream    t))
+  "Print a list of methods of the generic function associated to
+CONDITION onto STREAM."
+  (format stream "~%TODO: enumerate available xml-> methods here."))
