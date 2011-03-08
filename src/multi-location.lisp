@@ -81,12 +81,15 @@ have a name")
        (location-attribute location name)))
 
 (defmethod location-attribute ((location multi-location)
-			       (name     string))
+			       (name     string)
+			       &key
+			       uri)
   (flet ((find-attribute (item)
 	   (check-type item stp:element "an element node (and thus
 does not have attribute children). Did you try to use `@' or `(setf
 @)' on a location that already represents an attribute node?")
-	   (or (stp:find-attribute-named item name)
+	   (or (apply #'stp:find-attribute-named item name
+		      (when uri `(,uri)))
 	       (error "No attribute ~S at location ~A" name item))))
     (xpath:map-node-set->list #'find-attribute
 			      (location-result location))))

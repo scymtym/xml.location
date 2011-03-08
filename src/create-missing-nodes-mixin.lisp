@@ -36,12 +36,18 @@ classes."))
 		  (location-path     instance))))
 
 (defmethod location-attribute ((location create-missing-nodes-mixin)
-			       (name     string))
+			       (name     string)
+			       &key
+			       uri)
   ;; When the requested attribute NAME is missing, create it with an
   ;; empty value.
   (let ((item (location-result location)))
-    (or (stp:find-attribute-named item name)
-	(let ((attribute (stp:make-attribute "" name)))
+    (or (apply #'stp:find-attribute-named item name
+	       (when uri `(,uri)))
+	(let ((attribute
+	       (apply #'stp:make-attribute ""
+		      (if uri (concatenate 'string "foo:" name) name)
+		      (when uri `(,uri)))))
 	  (stp:add-attribute item attribute)
 	  attribute))))
 

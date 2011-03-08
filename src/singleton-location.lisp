@@ -115,14 +115,18 @@ XPath that produces exactly one match in the document."))
   (->xml new-value (location-attribute location name) type))
 
 (defmethod location-attribute :before ((location singleton-location)
-				       (name     string))
+				       (name     string)
+				       &key &allow-other-keys)
   (let ((item (location-result location)))
     (check-type item stp:element "an element node (and thus does not
 have attribute children). Did you try to use `@' or `(setf @)' on a
 location that already represents an attribute node?")))
 
 (defmethod location-attribute ((location singleton-location)
-			       (name     string))
+			       (name     string)
+			       &key
+			       uri)
   (let ((item (location-result location)))
-    (or (stp:find-attribute-named item name)
+    (or (apply #'stp:find-attribute-named item name
+	       (when uri `(,uri)))
 	(error "No attribute ~S at location ~A" name item))))
