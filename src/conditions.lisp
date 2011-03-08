@@ -296,18 +296,21 @@ CONDITION."
 	  (apply #'format stream control arguments))
 	(write-char #\. stream))))
 
-(defgeneric %add-available-conversion-methods (condition stream)
-  (:documentation
-   "Print a list of methods of the generic function associated to
-CONDITION onto STREAM."))
-
-(defmethod %add-available-conversion-methods ((condition no-->xml-conversion-method)
-					      (stream    t))
-
-  (format stream "~%TODO: enumerate available ->xml methods here."))
-
-(defmethod %add-available-conversion-methods ((condition no-xml->-conversion-method)
-					      (stream    t))
+(defun %add-available-conversion-methods (condition stream)
   "Print a list of methods of the generic function associated to
 CONDITION onto STREAM."
-  (format stream "~%TODO: enumerate available xml-> methods here."))
+  (%add-available-conversion-methods-for-function
+   (slot-value condition 'function)
+   stream))
+
+(defun %add-available-conversion-methods-for-function (function stream)
+  "Format the list of methods of the generic function designated by
+NAME onto STREAM. "
+  (let* ((methods        (closer-mop:generic-function-methods
+			  (symbol-function function)))
+	 (specializers   (map 'list #'closer-mop:method-specializers
+			      methods))
+	 (*print-circle* nil)) ;; make the method list more regular
+    (terpri stream)
+    (format stream "~@<Available conversion methods:~_~{+ (~{~A~^ ~})~_~}~@:>"
+	    specializers)))

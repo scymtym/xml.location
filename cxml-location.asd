@@ -39,6 +39,7 @@
   :depends-on  (:iterate
 		:metabang-bind
 		:split-sequence
+		:closer-mop
 		:cxml-stp
 		:xpath
 		:cl-dynamic-classes)
