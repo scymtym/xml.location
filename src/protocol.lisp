@@ -47,6 +47,11 @@ a string."))
    "Return the node or node set that has been produced by evaluating
 LOCATION's associated XPath on LOCATION's associated document."))
 
+(defgeneric location-attribute (location name
+				&key &allow-other-keys)
+  (:documentation
+   "Return the attribute(s) designated by NAME in LOCATION."))
+
 (defgeneric name (location
 		  &key
 		  prefix?)
