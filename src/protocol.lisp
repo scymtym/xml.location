@@ -52,6 +52,15 @@ LOCATION's associated XPath on LOCATION's associated document."))
   (:documentation
    "Return the attribute(s) designated by NAME in LOCATION."))
 
+(defgeneric compile! (location)
+  (:documentation
+   "Compile XPath associated to LOCATION."))
+
+(defgeneric evaluate! (location)
+  (:documentation
+   "Evaluate XPath associated to LOCATION on the document associated
+to LOCATION."))
+
 (defgeneric name (location
 		  &key
 		  prefix?)
