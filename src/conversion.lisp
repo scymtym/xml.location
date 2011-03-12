@@ -158,7 +158,8 @@ text.~@:>"
 
 (defmethod ->xml ((value string) (dest stp:node) (type (eql 'string))
 		  &key &allow-other-keys)
-  "Catch-all for STP nodes that no obvious string interpretation."
+  "Catch-all for STP nodes that do not have an obvious string
+interpretation."
   (error '->xml-conversion-error
 	 :value            value
 	 :destination      dest
