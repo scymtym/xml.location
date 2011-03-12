@@ -181,4 +181,4 @@ text.~@:>"
 (defmethod ->xml ((value sequence) (dest (eql nil)) (type (eql 'string))
 		  &key &allow-other-keys)
   "Convert sequence VALUE to string by `format'ting."
-  (format nil "~{~A~^ ~}" (coerce value 'list)))
+  (format nil "~{~S~^ ~}" (coerce value 'list)))
