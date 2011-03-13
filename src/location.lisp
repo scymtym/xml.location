@@ -124,6 +124,20 @@ set."
        (cxml:make-character-stream-sink
 	stream :omit-xml-declaration-p t)))))
 
+(defmethod location-attribute :around ((location location)
+				       (name     string)
+				       &rest args
+				       &key &allow-other-keys)
+  "Handle qualified attribute names."
+  (let ((index (position #\: name)))
+    (if index
+	(bind (((:slots namespaces) location)
+	       (env (xpath::make-dynamic-environment namespaces))
+	       ((:values local-name namespace)
+		(xpath::decode-qname name env t)))
+	  (apply #'call-next-method location local-name :uri namespace args))
+	(call-next-method))))
+
 
 ;;; Utility Functions
 ;;
