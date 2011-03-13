@@ -22,12 +22,17 @@
 (deftestsuite create-missing-nodes-mixin-root (root)
   ((cases '(("<bla><blup/><blop/></bla>"
 	     "/bla/blup/bli/node()")
+
 	    ("<bla><bli/><bli c='foo'/><bli><blup/></bli><bli><blup a='foo'/></bli></bla>"
 	     "/bla/bli/blup/@a"
 	     :if-multiple-matches :all)
+
 	    ("<bla><bli/><bli c='foo'/><bli><blup/></bli><bli><blup a='foo'/></bli></bla>"
 	     "/bla/bli/blup/@a"
-	     :if-multiple-matches :all))))
+	     :if-multiple-matches :all)
+
+	    ("<bla/>"
+	     "/bla/text()"))))
   (:documentation
    "Unit tests for the `create-missing-nodes-mixin' class."))
 

@@ -105,6 +105,14 @@ are encountered. "
 				  (predicate t))
   (%create-xpath-element location type "somenode" predicate))
 
+(defmethod %create-xpath-element ((location  stp:element)
+				  (type      (eql :child))
+				  (name      (eql :text))
+				  (predicate (eql nil)))
+  (let ((child (stp:make-text "text")))
+    (stp:append-child location child)
+    (list child)))
+
 (defmethod %create-xpath-element :around ((location  stp:element)
 					  (type      (eql :child))
 					  (name      t)
