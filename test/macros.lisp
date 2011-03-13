@@ -20,8 +20,15 @@
 (in-package :cxml-location.test)
 
 (deftestsuite macros-root (root)
-  ((simple-document (cxml:parse "<bla foo='1 2 4' bar='baz'>foo</bla>"
-				(stp:make-builder))))
+  ((simple-document    (cxml:parse
+			"<bla foo='1 2 4' bar='baz'>foo</bla>"
+			(stp:make-builder)))
+   (namespace-document (cxml:parse
+			"<bla
+xmlns:foo=\"http://foo.bar\"
+xmlns:baz=\"http://baz.doo\"
+foo:bar='foo.bar:bar' baz:bar='baz.doo:bar'/>"
+			(stp:make-builder))))
   (:documentation
    "Unit tests for the `with-locations' macros."))
 
@@ -75,3 +82,18 @@
 	  (macroexpand `(,macro (((:foo) "p")) simple-document)))
 	(ensure-condition 'no-such-accessor-form
 	  (macroexpand `(,macro (((:foo bar :baz 1) "p")) simple-document)))))
+
+(addtest (macros-root
+          :documentation
+	  "Ensure that optimized expansions still produce valid results.")
+  optimizations
+
+  (with-locations (((:@ (bar1 "ns:bar")) "node()"
+		    :namespaces '(("ns" . "http://foo.bar")))
+		   ((:@ (bar2 "ns:bar")) "node()"
+		    :namespaces '(("ns" . "http://baz.doo"))))
+      namespace-document
+    (ensure-same bar1 "foo.bar:bar"
+		 :test #'string=)
+    (ensure-same bar2 "baz.doo:bar"
+		 :test #'string=)))
