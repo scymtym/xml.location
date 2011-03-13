@@ -60,6 +60,11 @@ classes."))
    "Ensure that the nodes referenced in PATH actually exist in
 DOCUMENT, creating them if necessary."))
 
+(defgeneric %create-xpath-element (location type name predicate)
+  (:documentation
+   "Create the XPath element designated by TYPE, NAME and PREDICATE in
+LOCATION."))
+
 (defmethod create-xpath ((document stp:node) (path string))
   "Parse XPath and process parsed representation."
   (create-xpath document (xpath:parse-xpath path)))
