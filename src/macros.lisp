@@ -80,13 +80,20 @@ necessary. Return two values:
 					(append (when writable?
 						  `(:if-no-match :create))
 						args))))
+		 (key (cons path args))
 		 ((location-var &optional location-form)
 		  (cond
+		    ;; If PATH is not constant, we have to emit a
+		    ;; separate location form.
 		    ((not (constantp path))
 		     (make-location-form))
-		    ((butlast (gethash path reusable-locations)))
+		    ;; Otherwise, we can try to look it up in the
+		    ;; table of reusable locations.
+		    ((butlast (gethash key reusable-locations)))
+		    ;; If there was no reusable location, we have to
+		    ;; create a new one and add it to the table.
 		    (t
-		     (setf (gethash path reusable-locations)
+		     (setf (gethash key reusable-locations)
 			   (make-location-form)))))
 		 ((:values name access-form)
 		  (%parse-access-spec access-spec
