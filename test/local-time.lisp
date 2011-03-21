@@ -46,13 +46,17 @@
 		   "node()/@ts")))
     (ensure-same (val loc :type 'local-time:timestamp)
 		 now
-		 :test 'local-time:timestamp=))
+		 :test 'local-time:timestamp=)
+
+    ;; Inner types are invalid
+    (ensure-condition 'xml->-conversion-error
+      (val loc :type '(local-time:timestamp :some-inner-type))))
 
   ;; Two invalid timestamp values.
   (let ((loc (loc "<foo ts='invalid timestamp'/>" "node()/@ts")))
-    (ensure-condition 'simple-error
+    (ensure-condition 'xml->-conversion-error
       (val loc :type 'local-time:timestamp)))
 
   (let ((loc (loc "<foo ts='@invalid timestamp'/>" "node()/@ts")))
     (ensure-condition 'local-time::invalid-timestring
-     (val loc :type 'local-time:timestamp))))
+      (val loc :type 'local-time:timestamp))))

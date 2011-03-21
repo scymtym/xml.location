@@ -19,12 +19,30 @@
 
 (in-package :cxml-location)
 
+
+;;; String locations
+;;
+
 (defmethod xml-> ((value string) (type (eql 'local-time:timestamp))
-		  &key &allow-other-keys)
+		  &key
+		  inner-types
+		  &allow-other-keys)
   "Deserialize timestamp from VALUE."
+  (when inner-types
+    (error 'xml->-conversion-error
+	   :value            value
+	   :type             type
+	   :format-control   "~@<The type ~S does not have inner types, ~
+but ~S has been specified as inner types.~@:>"
+	   :format-arguments `(,type ,inner-types)))
+
   (unless (eq (aref value 0) #\@)
-    (error "Serialized timestamp value ~S does not start with '@'"
-	   value))
+    (error 'xml->-conversion-error
+	   :value            value
+	   :type             type
+	   :format-control   "~@<Serialized timestamp value ~S does not ~
+start with '@'.~@:>"
+	   :format-arguments `(,value)))
 
   (local-time:parse-timestring (subseq value 1) :fail-on-error t))
 
