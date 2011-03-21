@@ -23,15 +23,18 @@
 ;;; XML -> * Conversions
 ;;
 
-(defmethod xml-> ((value t) (type t)
-		  &key &allow-other-keys)
-  "Catch-all method to signal a conversion error."
-  (error 'no-xml->-conversion-method
-	 :value            value
-	 :type             type))
+(defmethod no-applicable-method ((function (eql (fdefinition 'xml->)))
+				 &rest args)
+  "Signal a conversion error if no applicable conversion method is
+found."
+  (bind (((value type &rest key-args) args))
+    (declare (ignore key-args))
+    (error 'no-xml->-conversion-method
+	   :value            value
+	   :type             type)))
 
-(defmethod xml-> :around ((value t) (type (eql nil))
-			  &key &allow-other-keys)
+(defmethod xml-> ((value t) (type list)
+		  &key &allow-other-keys)
   (error 'xml->-conversion-error
 	 :value            value
 	 :type             type
@@ -41,9 +44,13 @@
 (defmethod xml-> :around ((value t) (type list)
 			  &key &allow-other-keys)
   "Split composite type specification TYPE into head and tail."
-  (if (length= 1 type)
-      (xml-> value (first type))
-      (xml-> value (first type) :inner-types (rest type))))
+  (cond
+    ((null type)
+     (call-next-method))
+    ((length= 1 type)
+     (xml-> value (first type)))
+    (t
+     (xml-> value (first type) :inner-types (rest type)))))
 
 (defmethod xml-> ((value stp:text) (type t)
 		  &rest args
@@ -110,16 +117,19 @@ text.~@:>"
 ;;; * -> XML Conversions
 ;;
 
-(defmethod ->xml ((value t) (dest t) (type t)
-		  &key &allow-other-keys)
-  "Catch-all method to signal a conversion error."
-  (error 'no-->xml-conversion-method
-	 :value       value
-	 :destination dest
-	 :type        type))
+(defmethod no-applicable-method ((function (eql (fdefinition '->xml)))
+				 &rest args)
+  "Signal a conversion error if no applicable conversion method is
+found."
+  (bind (((value dest type &rest key-args) args))
+    (declare (ignore key-args))
+    (error 'no-->xml-conversion-method
+	   :value       value
+	   :destination dest
+	   :type        type)))
 
-(defmethod ->xml :around ((value t) (dest t) (type (eql nil))
-			  &key &allow-other-keys)
+(defmethod ->xml ((value t) (dest t) (type list)
+		  &key &allow-other-keys)
   (error '->xml-conversion-error
 	 :value            value
 	 :destination      dest
@@ -130,9 +140,13 @@ text.~@:>"
 (defmethod ->xml :around ((value t) (dest t) (type list)
 			  &key &allow-other-keys)
   "Split composite type specification TYPE into head and tail."
-  (if (length= 1 type)
-      (->xml value dest (first type))
-      (->xml value dest (first type) :inner-types (rest type))))
+  (cond
+    ((null type)
+     (call-next-method))
+    ((length= 1 type)
+     (->xml value dest (first type)))
+    (t
+     (->xml value dest (first type) :inner-types (rest type)))))
 
 (defmethod ->xml ((value t) (dest stp:text) (type t)
 		  &key &allow-other-keys)
