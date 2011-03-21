@@ -60,7 +60,9 @@ produced ~S, not ~S.~@:>"
 
   ;; Generic error behavior
   (ensure-condition 'no-xml->-conversion-method
-    (xml-> :value :type))
+    (xml-> :value :no-such-type))
+  (ensure-condition 'no-xml->-conversion-method
+    (xml-> :value '(:no-such-type :with-inner-type-foo)))
   (ensure-condition 'xml->-conversion-error
     (xml-> :value nil))
 
@@ -120,6 +122,8 @@ with type ~S produced ~S, not ~S.~@:>"
   ;; Generic error behavior
   (ensure-condition 'no-->xml-conversion-method
     (->xml :value :dest :no-such-type))
+  (ensure-condition 'no-->xml-conversion-method
+    (->xml :value :dest '(:no-such-type :with-inner-type-foo)))
   (ensure-condition '->xml-conversion-error
     (->xml :value :dest nil)) ;; nil is not a valid type
 
