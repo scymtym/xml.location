@@ -20,7 +20,12 @@
 (in-package :cxml-location.test)
 
 (deftestsuite local-time-root (root)
-  ()
+  ((now       (local-time:now))
+   (empty-loc (loc "<foo ts=''/>" "node()/@ts"))
+   (now-loc))
+  (:setup
+   (setf now-loc (loc (format nil "<foo ts='~S'/>" now)
+		      "node()/@ts")))
   (:documentation
    "Unit tests for local-time XML conversions."))
 
@@ -29,28 +34,29 @@
 	  "Test case for ->xml conversion.")
   ->xml
 
-  (let ((now (local-time:now))
-	(loc (loc "<foo ts='~S'/>" "node()/@ts")))
-    (setf (val loc) now)
-    (ensure-same (val loc)
-		 (format nil "~S" now)
-		 :test 'string=)))
+  (setf (val empty-loc) now)
+  (ensure-same (val empty-loc)
+	       (format nil "~S" now)
+	       :test 'string=))
 
 (addtest (local-time-root
           :documentation
 	  "Test case for xml-> conversion.")
   xml->
 
-  (let* ((now (local-time:now))
-	 (loc (loc (format nil "<foo ts='~S'/>" now)
-		   "node()/@ts")))
-    (ensure-same (val loc :type 'local-time:timestamp)
-		 now
-		 :test 'local-time:timestamp=)
+  (ensure-same (val now-loc :type 'local-time:timestamp)
+	       now
+	       :test 'local-time:timestamp=))
 
-    ;; Inner types are invalid
-    (ensure-condition 'xml->-conversion-error
-      (val loc :type '(local-time:timestamp :some-inner-type))))
+(addtest (local-time-root
+          :documentation
+	  "Test conditions signaled by local-time:timestamp
+conversions.")
+  conditions
+
+  ;; Inner types are invalid
+  (ensure-condition 'xml->-conversion-error
+    (val now-loc :type '(local-time:timestamp :some-inner-type)))
 
   ;; Two invalid timestamp values.
   (let ((loc (loc "<foo ts='invalid timestamp'/>" "node()/@ts")))
