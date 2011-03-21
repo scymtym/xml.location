@@ -24,7 +24,7 @@
   (:documentation
    "Root test suite for conversion tests."))
 
-(deftestsuite xml->root (conversion-root)
+(deftestsuite xml->-root (conversion-root)
   ((cases '(("string" string        "string")
 	    ("5"      real          5)
 	    ("5"      (real)        5)
@@ -42,7 +42,7 @@ produced ~S, not ~S.~@:>"
   (:documentation
    "Root test suite for from-XML conversion tests."))
 
-(addtest (xml->root
+(addtest (xml->-root
           :documentation
 	  "Smoke test for from-XML conversion.")
   smoke
@@ -53,7 +53,7 @@ produced ~S, not ~S.~@:>"
 	(check-xml->-conversion
 	 (stp:make-attribute value "foo") type expected)))
 
-(addtest (xml->root
+(addtest (xml->-root
           :documentation
 	  "Test for conditions signaled by from-XML conversions.")
   conditions
