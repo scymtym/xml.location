@@ -76,7 +76,7 @@ are encountered. "
 		      (collect `(xpath:xpath (:path ,e)))))
 	 ((:flet path-guts (expr))
 	  (lastcar (cdadr expr)))
-	 ((:function one-step (location step &rest steps))
+	 ((:labels one-step (location step &rest steps))
 	  (let* ((result (xpath:evaluate step location))
 		 (nodes  (if (xpath:node-set-empty-p result)
 			     (let ((spec (path-guts step)))
