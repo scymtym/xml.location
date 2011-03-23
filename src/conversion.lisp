@@ -30,8 +30,8 @@ found."
   (bind (((value type &rest key-args) args))
     (declare (ignore key-args))
     (error 'no-xml->-conversion-method
-	   :value            value
-	   :type             type)))
+	   :value value
+	   :type  type)))
 
 (defmethod xml-> ((value t) (type list)
 		  &key &allow-other-keys)
@@ -102,16 +102,18 @@ text.~@:>"
 		  &key
 		  (inner-types '(string) inner-types-supplied?))
   "Convert intermediate string VALUE to requested list type TYPE."
-  (let ((chunks (split-sequence:split-sequence
-		 #\Space value :remove-empty-subseqs t)))
-    (cond
-      ((not inner-types-supplied?)
-       chunks)
-      ((length= 1 inner-types)
-       (let ((type (first inner-types)))
-	 (map 'list (rcurry #'xml-> type) chunks)))
-      (t
-       (map 'list (rcurry #'xml-> inner-types) chunks)))))
+  (cond
+    ((not inner-types-supplied?)
+     (%split-at-whitespace value))
+    ((length= 1 inner-types)
+     (let ((inner-type (first inner-types)))
+       (if (subtypep inner-type 'atom)
+	   (%parse-list-of-atoms value)
+	   (map 'list (rcurry #'xml-> inner-type)
+		(%split-at-whitespace value)))))
+    (t
+     (map 'list (rcurry #'xml-> inner-types)
+	  (%split-at-whitespace value)))))
 
 
 ;;; * -> XML Conversions
@@ -197,3 +199,24 @@ text.~@:>"
 		  &key &allow-other-keys)
   "Convert sequence VALUE to string by `format'ting."
   (format nil "~{~S~^ ~}" (coerce value 'list)))
+
+
+;;; Utility functions
+;;
+
+(declaim (ftype (function (string) list) %parse-list-of-atoms))
+
+(defun %parse-list-of-atoms (string)
+  (let ((stream     (make-string-input-stream string))
+	(eof-marker (gensym)))
+    (iter (for value next (read stream nil eof-marker))
+	  (until (eq value eof-marker))
+	  (collect value))))
+
+(declaim (ftype (function (string) list) %split-at-whitespace))
+
+(defun %split-at-whitespace (string)
+  (nth-value 0 (split-sequence:split-sequence-if
+		#'(lambda (c) (or (eq c #\Space)
+				  (eq C #\Newline)))
+		string :remove-empty-subseqs t)))
