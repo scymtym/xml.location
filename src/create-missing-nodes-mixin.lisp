@@ -81,7 +81,7 @@ are encountered. "
 		 (nodes  (if (xpath:node-set-empty-p result)
 			     (let ((spec (path-guts step)))
 			       (apply #'%create-xpath-element
-				      location (append spec (make-list (- 3 (length spec))))))
+				      location (%expand-xpath-element spec)))
 			     (xpath:all-nodes result))))
 	    (when steps
 	      (map nil #'(lambda (n) (apply #'one-step n steps)) nodes)))))
@@ -167,3 +167,19 @@ are encountered. "
   (let ((attribute (stp:make-attribute "" name)))
     (stp:add-attribute location attribute)
     (list attribute)))
+
+
+;;; Utility functions
+;;
+
+(declaim (ftype (function (list) (cons t (cons t (cons t null))))
+		%expand-xpath-element)
+	 (inline %expand-xpath-element))
+
+(defun %expand-xpath-element (spec)
+  "When necessary, pad the list SPEC with nil elements such that its
+length becomes 3."
+  (let ((missing (- 3 (length spec))))
+    (if (zerop missing)
+	spec
+	(append spec (make-list missing)))))
