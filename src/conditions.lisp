@@ -174,7 +174,8 @@ creation of a node failed."))
 		     :format-arguments nil)
   (:report
    (lambda (condition stream)
-     (format stream "~@<Could create node for XPath fragment (~S ~S ~S) at location ~A~@:>"
+     (format stream "~@<Could not create node for XPath fragment (~S ~
+~S ~S) at location ~A~@:>"
 	     (xpath-creation-error-type      condition)
 	     (xpath-creation-error-name      condition)
 	     (xpath-creation-error-predicate condition)
