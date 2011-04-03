@@ -187,8 +187,9 @@ XPath fragment fails."))
 	  :reader   conversion-error-type
 	  :documentation
 	  "The type involved in the failed conversion."))
-  (:default-initargs :format-control   ""
-    :format-arguments nil)
+  (:default-initargs
+   :format-control   ""
+   :format-arguments nil)
   (:report
    (lambda (condition stream)
      (format stream "~@<Conversion failed for value ~S and type ~S~@:>"
