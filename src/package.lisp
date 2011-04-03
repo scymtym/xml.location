@@ -42,6 +42,8 @@
    :location-error-document
    :location-error-path
 
+   :missing-xpath-source
+
    :result-set-error-mixin
    :location-error-result-set
 
@@ -103,7 +105,8 @@
   ;; Location Classes
   (:export
    :location
-   :singleton-location :multi-location
+   :singleton-location
+   :multi-location
    :create-missing-nodes-mixin
    :ignore-empty-results-mixin)
 

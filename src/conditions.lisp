@@ -40,6 +40,16 @@ document ~A and XPATH ~A occurred.~@:>"
    "This condition class can be used to discriminate location-related
 errors."))
 
+(define-condition missing-xpath-source (error)
+  ()
+  (:report
+   (lambda (condition stream)
+     (format stream "~@<XPath source not available - cannot recompile.~@:>")))
+  (:documentation
+   "This condition is signaled when recompilation of an XPath would be
+required but the XPath source is not available. This can happen, for
+example, when the namespace table of a location is changed."))
+
 
 ;;; Result-set-related Errors
 ;;

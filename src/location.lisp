@@ -111,7 +111,7 @@ out on the node or nodes of the node set."))
 (defmethod compile! :before ((location location))
   "Check whether the XPath source is available."
   (unless (slot-value location 'path)
-    (error "XPath source not available - Cannot recompile")))
+    (error 'missing-xpath-source)))
 
 (defmethod compile! ((location location))
   "Compile the XPath and store the result."
