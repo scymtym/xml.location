@@ -160,4 +160,4 @@ INNER-TYPES. The result of the conversion is returned."))
 (defgeneric ->xml (value dest type &key inner-types)
   (:documentation
    "Convert VALUE to a suitable type and store the result of the
-conversion in the XML node DEST."))
+conversion in the XML node DEST. Should return VALUE."))
