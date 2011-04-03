@@ -70,6 +70,20 @@ foo:bar='foo.bar:bar' baz:bar='baz.doo:bar'/>"
 
 (addtest (macros-root
           :documentation
+	  "Test :loc binding form of `with-locations' macro.")
+  loc
+
+  (with-locations (((:loc self) "bla")
+		   ((:loc text) "bla/text()")) simple-document
+    (ensure-same
+     (name self) "bla"
+     :test #'string=)
+    (ensure-same
+     (val text) "foo"
+     :test #'string=)))
+
+(addtest (macros-root
+          :documentation
 	  "Unit test for conditions that should be signaled by
 `with-locations' macros.")
   conditions

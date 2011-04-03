@@ -165,6 +165,15 @@ and ARGS. Return two values:
 	     :inner-specs `(,spec)
 	     args)))
 
+(defmethod %parse-access-spec ((spec (eql :loc))
+			       &key
+			       location-var
+			       inner-specs)
+  (bind (((name) inner-specs))
+    (values
+     name
+     `(loc ,location-var ".")))) ;; TODO inefficient
+
 (defmethod %parse-access-spec ((spec (eql :name))
 			       &key
 			       location-var
