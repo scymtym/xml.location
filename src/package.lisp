@@ -31,9 +31,10 @@
    :split-sequence
    :dynamic-classes)
 
-  ;; Special Symbols
+  ;; Special Symbols and variables
   (:export
-   :&default)
+   :&default
+   :*cl-namespaces*)
 
   ;; Conditions
   (:export
