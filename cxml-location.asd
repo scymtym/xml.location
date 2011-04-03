@@ -45,6 +45,8 @@
 		:cl-dynamic-classes)
   :components  ((:module     "src"
 		 :components ((:file       "package")
+			      (:file       "types"
+			       :depends-on ("package"))
 			      (:file       "conditions"
 			       :depends-on ("package"))
 			      (:file       "variables"
