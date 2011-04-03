@@ -53,6 +53,9 @@
 			       :depends-on ("package"))
 			      (:file       "protocol"
 			       :depends-on ("package"))
+			      (:file       "xpath-creation"
+			       :depends-on ("package" "types"))
+
 			      (:file       "location"
 			       :depends-on ("package" "conditions"
 					    "protocol"))
@@ -62,8 +65,9 @@
 			      (:file       "multi-location"
 			       :depends-on ("package" "location"))
 			      (:file       "create-missing-nodes-mixin"
-			       :depends-on ("package" "types"
+			       :depends-on ("package" "xpath-creation"
 					    "location"))
+
 			      (:file       "conversion"
 			       :depends-on ("package" "protocol"))
 			      (:file       "construction"
