@@ -44,7 +44,9 @@ errors."))
   ()
   (:report
    (lambda (condition stream)
-     (format stream "~@<XPath source not available - cannot recompile.~@:>")))
+     (declare (ignore condition))
+     (format stream "~@<XPath source not available - cannot ~
+recompile.~@:>")))
   (:documentation
    "This condition is signaled when recompilation of an XPath would be
 required but the XPath source is not available. This can happen, for
