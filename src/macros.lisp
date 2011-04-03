@@ -172,7 +172,7 @@ and ARGS. Return two values:
   (bind (((name) inner-specs))
     (values
      name
-     `(loc ,location-var ".")))) ;; TODO inefficient
+     `(loc ,location-var "."))))
 
 (defmethod %parse-access-spec ((spec (eql :name))
 			       &key
