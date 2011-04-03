@@ -23,7 +23,7 @@
 		&rest args
 		&key
 		(if-multiple-matches :error)
-		if-no-match
+		(if-no-match         :error)
 		&allow-other-keys)
   "Create a location for DOCUMENT and PATH. The class of the location
 instance is determined based on the values of IF-MULTIPLE-MATCHES and
@@ -53,17 +53,26 @@ IF-NO-MATCH."
 ;;; Utility Functions
 ;;
 
+(declaim (ftype (function (&rest list
+			   &key
+			   (:if-multiple-matches if-multiple-matches-policy-designator)
+			   (:if-no-match         if-no-match-policy-designator)
+			   &allow-other-keys)
+			  (values class list))
+		%compute-location-class))
+
 (defun %compute-location-class (&rest args
 				&key
 				(if-multiple-matches :error)
-				if-no-match
+				(if-no-match         :error)
 				&allow-other-keys)
   "Compute a location class based on the values of IF-MULTIPLE-MATCHES
 and IF-NO-MATCH. This is a separate function to make it usable in
 compiler macros."
   (let ((mixins))
+
     ;; Multiple matches policy
-    (case if-multiple-matches
+    (ecase if-multiple-matches
       ((:error :first :last :any)
        (push 'singleton-location mixins))
       (:all
@@ -71,10 +80,11 @@ compiler macros."
        (remove-from-plistf args :if-multiple-matches :if-no-match)))
 
     ;; No match policy
-    (when if-no-match
-      (ecase if-no-match
-	(:create
-	 (push 'create-missing-nodes-mixin mixins))
-	((:error :do-nothing))))
+    (ecase if-no-match
+      (:create
+       (push 'create-missing-nodes-mixin mixins))
+      (:do-nothing)
+      (:error))
 
+    ;; Return the class and initargs
     (values (ensure-location-class mixins) args)))

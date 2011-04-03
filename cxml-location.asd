@@ -65,8 +65,9 @@
 			      (:file       "conversion"
 			       :depends-on ("package" "protocol"))
 			      (:file       "construction"
-			       :depends-on ("package" "conditions"
-					    "protocol" "location"
+			       :depends-on ("package" "types"
+					    "conditions" "protocol"
+					    "location"
 					    "singleton-location"
 					    "multi-location"))
 			      (:file       "macros"
