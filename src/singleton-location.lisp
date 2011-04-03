@@ -131,8 +131,7 @@ location that already represents an attribute node?")))
 (defmethod location-attribute ((location singleton-location)
 			       (name     string)
 			       &key
-			       uri)
+			       (uri ""))
   (let ((item (location-result location)))
-    (or (apply #'stp:find-attribute-named item name
-	       (when uri `(,uri)))
+    (or (stp:find-attribute-named item name uri)
 	(error "No attribute ~S at location ~A" name item))))
