@@ -57,15 +57,16 @@ are encountered. "
 	       nodes))))
     (apply #'one-step document (rest path))))
 
-(defmethod %create-xpath-element ((location  t)
-				  (type      t)
-				  (name      t)
-				  (predicate t))
-  (error 'xpath-creation-error
-	 :location  location
-	 :type      type
-	 :name      name
-	 :predicate predicate))
+(defmethod no-applicable-method ((fuction (eql (fdefinition '%create-xpath-element)))
+				 &rest args)
+  "Signal an error if no `%create-xpath-element' method is
+applicable."
+  (bind (((location type name predicate) args))
+    (error 'xpath-creation-error
+	   :location  location
+	   :type      type
+	   :name      name
+	   :predicate predicate)))
 
 (defmethod %create-xpath-element ((location  stp:element)
 				  (type      (eql :child))
