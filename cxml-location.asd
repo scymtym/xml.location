@@ -67,6 +67,8 @@
 			      (:file       "create-missing-nodes-mixin"
 			       :depends-on ("package" "xpath-creation"
 					    "location"))
+			      (:file       "ignore-empty-results-mixin"
+			       :depends-on ("package" "protocol"))
 
 			      (:file       "conversion"
 			       :depends-on ("package" "protocol"))
@@ -75,7 +77,9 @@
 					    "conditions" "protocol"
 					    "location"
 					    "singleton-location"
-					    "multi-location"))
+					    "multi-location"
+					    "create-missing-nodes-mixin"
+					    "ignore-empty-results-mixin"))
 			      (:file       "macros"
 			       :depends-on ("package" "protocol")))))
   :in-order-to ((test-op (test-op :cxml-location-test))))
@@ -97,8 +101,12 @@
 			       :depends-on ("package"))
 			      (:file       "macros"
 			       :depends-on ("package"))
+
 			      (:file       "create-missing-nodes-mixin"
 			       :depends-on ("package"))
+			      (:file       "ignore-empty-results-mixin"
+			       :depends-on ("package"))
+
 			      (:file       "local-time"
 			       :depends-on ("package")))))
   :in-order-to ((test-op (load-op :cxml-location-test))))

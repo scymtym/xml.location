@@ -83,7 +83,8 @@ compiler macros."
     (ecase if-no-match
       (:create
        (push 'create-missing-nodes-mixin mixins))
-      (:do-nothing)
+      (:do-nothing
+       (push 'ignore-empty-result-mixin mixins))
       (:error))
 
     ;; Return the class and initargs

@@ -51,7 +51,9 @@ XPath that produces exactly one match in the document."))
 		 :document   document
 		 :path       path
 		 :result-set result-set))
-	 (:create :do-nothing)))
+	 (:do-nothing
+	  (setf result nil))
+	 (:create)))
 
       ;; Exactly one match.
       ((length= 1 (xpath:all-nodes result-set))
