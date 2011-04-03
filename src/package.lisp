@@ -35,12 +35,19 @@
   ;; Conditions
   (:export
    :location-error
+   :location-error-document
+   :location-error-path
+
    :result-set-error-mixin
+   :location-error-result-set
+
    :empty-result-set
+
    :too-many-matches-in-result-set
 
    :invalid-binding-form
    :invalid-binding-form-form
+
    :no-such-accessor-form
    :invalid-binding-form-spec
    :invalid-binding-form-name
@@ -54,12 +61,17 @@
    :conversion-error
    :conversion-error-value
    :conversion-error-type
+
    :no-conversion-method-mixin
    :conversion-error-function
+
    :xml->-conversion-error
+
    :no-xml->-conversion-method
+
    :->xml-conversion-error
    :conversion-error-destination
+
    :no-->xml-conversion-method)
 
   ;; Location Protocol
