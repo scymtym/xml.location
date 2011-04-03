@@ -120,6 +120,12 @@ XPath that produces exactly one match in the document."))
 		     (type 'string))
   (->xml new-value (location-attribute location name) type))
 
+(defmethod loc ((location singleton-location)
+		(path     t)
+		&rest args
+		&key &allow-other-keys)
+  (apply #'loc (location-result location) path args))
+
 (defmethod location-attribute :before ((location singleton-location)
 				       (name     string)
 				       &key &allow-other-keys)

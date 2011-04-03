@@ -28,6 +28,7 @@
           :documentation
 	  "Smoke test for location class.")
   smoke
+
   (ensure (loc "<simple attr='8'>text</simple>" "simple/text()")))
 
 (addtest (location-root
@@ -46,6 +47,20 @@
 
     (setf (name loc) "blup")
     (ensure-same (name loc) '("blup" "blup"))))
+
+(addtest (location-root
+          :documentation
+	  "Test `loc' reader.")
+  loc
+
+  (let* ((loc   (loc "<foo><bar baz='bla'/></foo>" "node()"))
+	 (child (loc loc "bar")))
+    (ensure-same
+     (name child) "bar"
+     :test #'string=)
+    (ensure-same
+     (@ child "baz") "bla"
+     :test #'string=)))
 
 (addtest (location-root
           :documentation

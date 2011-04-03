@@ -87,6 +87,14 @@ have a name")
   (map 'list #'(lambda (attr) (->xml new-value attr type))
        (location-attribute location name)))
 
+(defmethod loc ((location multi-location)
+		(path     t)
+		&rest args
+		&key &allow-other-keys)
+  (xpath:map-node-set->list
+   #'(lambda (node) (apply #'loc node path args))
+   (location-result location)))
+
 (defmethod location-attribute ((location multi-location)
 			       (name     string)
 			       &key
