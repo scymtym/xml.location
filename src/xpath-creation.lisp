@@ -71,11 +71,11 @@ are encountered. "
   "Potentially create XPath PATH in DOCUMENT except for the final
 element. Then unconditionally create a node matching the final element
 of PATH."
-  (let* ((butlast (butlast (rest path)))
-	 (parents (if butlast
-		      (create-xpath document `(:path ,@butlast))
-		      (list document)))
-	 (final (lastcar path))
+  (let* ((butlast  (butlast (rest path)))
+	 (parents  (if butlast
+		       (create-xpath document `(:path ,@butlast))
+		       (list document)))
+	 (final    (lastcar path))
 	 (expanded (%expand-xpath-element final)))
     (mapcan #'(lambda (parent)
 		(apply #'create-xpath-element parent expanded))
