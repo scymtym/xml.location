@@ -30,7 +30,7 @@ xmlns:baz=\"http://baz.doo\"
 foo:bar='foo.bar:bar' baz:bar='baz.doo:bar'/>"
 			(stp:make-builder)))
    (multi-document     (cxml:parse
-			"<bla><bar foo='1'/><bar foo='2'/></bla>"
+			"<bla>foo<bar foo='1'/><bar foo='2'/></bla>"
 			(stp:make-builder))))
   (:documentation
    "Unit tests for the `with-locations' macros."))
@@ -74,7 +74,7 @@ foo:bar='foo.bar:bar' baz:bar='baz.doo:bar'/>"
   loc
 
   (with-locations (((:loc self) "bla")
-		   ((:loc text) "bla/text()")) simple-document
+		   ((:loc text) "bla/text()")) multi-document
     (ensure-same
      (name self) "bla"
      :test #'string=)
