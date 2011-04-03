@@ -28,6 +28,9 @@
 xmlns:foo=\"http://foo.bar\"
 xmlns:baz=\"http://baz.doo\"
 foo:bar='foo.bar:bar' baz:bar='baz.doo:bar'/>"
+			(stp:make-builder)))
+   (multi-document     (cxml:parse
+			"<bla><bar foo='1'/><bar foo='2'/></bla>"
 			(stp:make-builder))))
   (:documentation
    "Unit tests for the `with-locations' macros."))
@@ -72,6 +75,12 @@ foo:bar='foo.bar:bar' baz:bar='baz.doo:bar'/>"
   conditions
 
   (iter (for macro in '(with-locations with-locations-r/o))
+	(ensure-condition 'invalid-binding-form
+	  (macroexpand `(,macro ("bla") simple-document)))
+	(ensure-condition 'invalid-binding-form
+	  (macroexpand `(,macro (1) simple-document)))
+	(ensure-condition 'invalid-binding-form
+	  (macroexpand `(,macro (:key-without-value) simple-document)))
 	(ensure-condition 'no-such-accessor-form
 	  (macroexpand `(,macro ((() "p")) simple-document)))
 	(ensure-condition 'no-such-accessor-form
@@ -81,11 +90,13 @@ foo:bar='foo.bar:bar' baz:bar='baz.doo:bar'/>"
 	(ensure-condition 'no-such-accessor-form
 	  (macroexpand `(,macro (((:foo) "p")) simple-document)))
 	(ensure-condition 'no-such-accessor-form
-	  (macroexpand `(,macro (((:foo bar :baz 1) "p")) simple-document)))))
+	  (macroexpand `(,macro (((:foo bar :baz 1) "p"))
+				simple-document)))))
 
 (addtest (macros-root
           :documentation
-	  "Ensure that optimized expansions still produce valid results.")
+	  "Ensure that optimized expansions still produce valid
+results.")
   optimizations
 
   (with-locations (((:@ (bar1 "ns:bar")) "node()"
@@ -97,3 +108,14 @@ foo:bar='foo.bar:bar' baz:bar='baz.doo:bar'/>"
 		 :test #'string=)
     (ensure-same bar2 "baz.doo:bar"
 		 :test #'string=)))
+
+(addtest (macros-root
+          :documentation
+	  "Test specifying global options in `with-locations'.")
+  options
+
+  (with-locations-r/o (((:@ foo :type 'number) "bla/bar")
+		       :if-multiple-matches :all) multi-document
+    (ensure-same
+     foo '(1 2)
+     :test #'equalp)))

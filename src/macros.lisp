@@ -19,20 +19,22 @@
 
 (in-package :cxml-location)
 
-(defmacro with-locations ((&rest bindings) document &body body)
+(defmacro with-locations ((&rest bindings-and-options) document
+			  &body body)
   "Execute body with certain variables, specified by BINDINGS bound to
 locations in DOCUMENT. DOCUMENT has to be of type
 `stp:document'.
 
-BINDINGS specifies let-like (generalized) variable
+BINDINGS-AND-OPTIONS specifies let-like (generalized) variable
 bindings according to the following syntax:
-BINDINGS  ::= (BINDING*)
+BINDINGS  ::= (BINDING* OPTION*)
 BINDING   ::= (VAR-SPEC XPATH [ARG*])
 VAR-SPEC  ::= NAME-SPEC | VAL-SPEC | @-SPEC
 NAME-SPEC ::= (:name SYMBOL [:prefix? BOOL])
 VAL-SPEC  ::= SYMBOL | (:val SYMBOL [:type TYPE])
 @-SPEC    ::= (:@ @-name [:type TYPE])
 @-NAME    ::= SYMBOL | (SYMBOL \"STRING\")
+OPTION    ::= KEY VALUE
 
 In all cases, SYMBOL is the name of the generalized variable that is
 created by the binding. If the (SYMBOL \"STRING\") form of @-NAME is
@@ -43,18 +45,25 @@ SYMBOL).
 Instead of the keywords :name, :val and :@ symbols of the same name in
 the cxml-location package can be used."
   (once-only (document)
-    (bind (((:values locations places)
+    (bind (((:values bindings options)
+	    (%parse-bindings-and-options bindings-and-options))
+	   ((:values locations places)
 	    (%make-location-and-place-forms document bindings
-					    :writable? t)))
+					    :global-args options
+					    :writable?   t)))
       `(let ,locations
 	 (symbol-macrolet ,places
 	   ,@body)))))
 
-(defmacro with-locations-r/o ((&rest bindings) document &body body)
+(defmacro with-locations-r/o ((&rest bindings-and-options) document
+			      &body body)
   "Like `with-locations', but binding places are not `setf'-able."
   (once-only (document)
-    (bind (((:values locations places)
-	    (%make-location-and-place-forms document bindings)))
+    (bind (((:values bindings options)
+	    (%parse-bindings-and-options bindings-and-options))
+	   ((:values locations places)
+	    (%make-location-and-place-forms document bindings
+					    :global-args options)))
       `(let* (,@locations
 	      ,@places)
 	 ,@body))))
@@ -65,6 +74,7 @@ the cxml-location package can be used."
 
 (defun %make-location-and-place-forms (document bindings
 				       &key
+				       global-args
 				       writable?)
   "Generate location and place forms for DOCUMENT and BINDINGS.
 When WRITABLE? is non-nil, locations are created in the document if
@@ -79,6 +89,7 @@ necessary. Return two values:
 		   (%make-location-form document path
 					(append (when writable?
 						  `(:if-no-match :create))
+						global-args
 						args))))
 		 (key (cons path args))
 		 ((location-var &optional location-form)
@@ -205,6 +216,29 @@ and ARGS. Return two values:
 
 ;;; Utility Functions
 ;;
+
+(defun %parse-bindings-and-options (bindings-and-options)
+  "Separate BINDINGS-AND-OPTIONS into binding forms and
+options. Return two values: the collected binding forms and a plist
+containing the collected options."
+  (iter (for  (binding-or-key binding-or-value) on bindings-and-options)
+	(with skip?)
+	(cond
+	  (skip?
+	   (setf skip? nil))
+	  ((listp binding-or-key)
+	   (collect binding-or-key :into bindings))
+	  ((keywordp binding-or-key)
+	   (unless binding-or-value
+	     (error 'invalid-binding-form
+		    :form binding-or-key))
+	   (collect binding-or-key   :into options)
+	   (collect binding-or-value :into options)
+	   (setf skip? t))
+	  (t
+	   (error 'invalid-binding-form
+		  :form binding-or-key)))
+	(finally (return (values bindings options)))))
 
 (defun %signal-no-such-accessor-form (spec args)
   (error 'no-such-accessor-form
