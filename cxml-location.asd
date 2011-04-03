@@ -92,7 +92,9 @@
   :description "Unit tests for the cxml-location system."
   :depends-on  (:cxml-location
 		:lift
-		:local-time)
+
+		:local-time
+		:lisplab)
   :components  ((:module     "test"
 		 :components ((:file       "package")
 			      (:file       "location"
@@ -108,6 +110,9 @@
 			       :depends-on ("package"))
 
 			      (:file       "local-time"
+			       :depends-on ("package"))
+
+			      (:file       "lisplab"
 			       :depends-on ("package")))))
   :in-order-to ((test-op (load-op :cxml-location-test))))
 
@@ -125,3 +130,15 @@
 	        local-time)
   :components  ((:file       "local-time"
 		 :pathname   "src/local-time")))
+
+#+asdf-system-connections
+(defsystem-connection :cxml-location-and-lisplab
+  :author      "Jan Moringen <jmoringe@techfak.uni-bielefeld.de>"
+  :maintainer  "Jan Moringen <jmoringe@techfak.uni-bielefeld.de>"
+  :version     "0.1.0"
+  :license     "GPL3; see COPYING file for details."
+  :description "To and from XML conversion for matrices."
+  :requires    (cxml-location
+	        lisplab)
+  :components  ((:file       "lisplab"
+		 :pathname   "src/lisplab")))
