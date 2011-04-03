@@ -43,29 +43,29 @@
 		:cxml-stp
 		:xpath
 		:cl-dynamic-classes)
-  :components  ((:module "src"
-		 :components ((:file "package")
-			      (:file "conditions"
+  :components  ((:module     "src"
+		 :components ((:file       "package")
+			      (:file       "conditions"
 			       :depends-on ("package"))
-			      (:file "protocol"
+			      (:file       "protocol"
 			       :depends-on ("package"))
-			      (:file "location"
+			      (:file       "location"
 			       :depends-on ("package" "conditions"
 					    "protocol"))
-			      (:file "singleton-location"
+			      (:file       "singleton-location"
 			       :depends-on ("package" "location"))
-			      (:file "multi-location"
+			      (:file       "multi-location"
 			       :depends-on ("package" "location"))
-			      (:file "create-missing-nodes-mixin"
+			      (:file       "create-missing-nodes-mixin"
 			       :depends-on ("package" "location"))
-			      (:file "conversion"
+			      (:file       "conversion"
 			       :depends-on ("package" "protocol"))
-			      (:file "construction"
+			      (:file       "construction"
 			       :depends-on ("package" "conditions"
 					    "protocol" "location"
 					    "singleton-location"
 					    "multi-location"))
-			      (:file "macros"
+			      (:file       "macros"
 			       :depends-on ("package" "protocol")))))
   :in-order-to ((test-op (test-op :cxml-location-test))))
 
@@ -78,17 +78,17 @@
   :depends-on  (:cxml-location
 		:lift
 		:local-time)
-  :components  ((:module "test"
-		 :components ((:file "package")
-			      (:file "location"
+  :components  ((:module     "test"
+		 :components ((:file       "package")
+			      (:file       "location"
 			       :depends-on ("package"))
 			      (:file       "conversion"
 			       :depends-on ("package"))
-			      (:file "macros"
+			      (:file       "macros"
 			       :depends-on ("package"))
-			      (:file "create-missing-nodes-mixin"
+			      (:file       "create-missing-nodes-mixin"
 			       :depends-on ("package"))
-			      (:file "local-time"
+			      (:file       "local-time"
 			       :depends-on ("package")))))
   :in-order-to ((test-op (load-op :cxml-location-test))))
 
@@ -104,7 +104,5 @@
   :description "To and from XML conversion for local-time timestamps."
   :requires    (cxml-location
 	        local-time)
-  :components  ((:module "src"
-		 :components ((:file "package")
-			      (:file "local-time"
-			       :depends-on ("package"))))))
+  :components  ((:file       "local-time"
+		 :pathname   "src/local-time")))
