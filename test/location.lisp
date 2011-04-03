@@ -58,19 +58,27 @@
      (location-namespaces loc)
      '((nil     . "")
        ("xmlns" . "http://www.w3.org/2000/xmlns/")
-      ("xml"    . "http://www.w3.org/XML/1998/namespace")
-      ("fb"     . "http://foo.org/bar"))
+       ("xml"   . "http://www.w3.org/XML/1998/namespace")
+       ("fb"    . "http://foo.org/bar"))
      :test #'equal))
 
-  (let ((loc (loc "<bla xmlns='http://foo.org/bar' a='1'><bli b='5'>umumum</bli><bli/></bla>"
+  (let ((loc (loc "<bla xmlns='http://foo.org/bar' xmlns:fb='http://foo.org/bar' a='1'><bli b='5'>umumum</bli><fb:bli/></bla>"
 		  "/fb:bla/fb:bli"
 		  :if-multiple-matches :all
 		  :namespaces '(&default ("fb" . "http://foo.org/bar")))))
     (ensure-same (name loc)            '("bli" "bli"))
-    (ensure-same (name loc :prefix? t) '("bli" "bli")))
+    (ensure-same (name loc :prefix? t) '("bli" "fb:bli")))
 
   (let ((loc (loc "<fb:bla xmlns:fb='http://foo.org/bar' a='1'><bli b='5'>umumum</bli><bli/></fb:bla>"
 		  "/fb:bla"
 		  :namespaces '(&default ("fb" . "http://foo.org/bar")))))
     (ensure-same (name loc)            "bla")
-    (ensure-same (name loc :prefix? t) "fb:bla")))
+    (ensure-same (name loc :prefix? t) "fb:bla"))
+
+  ;; Test setting the element's name to a qualified name.
+  (let ((loc (loc "<bla/>" "node()"
+		  :namespaces '(&default ("foo" . "http://bar.bzr")))))
+    (setf (name loc) "foo:bar")
+    (ensure-same
+     (name loc :prefix? t) "foo:bar"
+     :test #'string=)))

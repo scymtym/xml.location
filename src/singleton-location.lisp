@@ -85,11 +85,15 @@ XPath that produces exactly one match in the document."))
 (defmethod (setf name) ((new-value string)
 			(location  singleton-location))
   (let ((item (location-result location)))
-    (if (find #\: new-value)
-	(bind (((prefix local-name) (split-sequence #\: new-value)))
-	  (setf (stp:namespace-prefix item) prefix
-		(stp:local-name item)       local-name))
-	(setf (stp:local-name item) new-value)))
+    (setf (stp:local-name item) new-value)))
+
+(defmethod (setf name) ((new-value list)
+			(location  singleton-location))
+  (bind (((local-name prefix uri) new-value)
+	 (item (location-result location)))
+    (setf (stp:namespace-uri    item) uri
+	  (stp:namespace-prefix item) prefix
+	  (stp:local-name       item) local-name))
   new-value)
 
 (defmethod val ((location singleton-location)

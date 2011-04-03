@@ -61,6 +61,13 @@ LOCATION's associated XPath on LOCATION's associated document."))
    "Evaluate XPath associated to LOCATION on the document associated
 to LOCATION."))
 
+(defgeneric maybe-decode-qname (location name)
+  (:documentation
+   "If NAME is qualified, decode it into local-name prefix and uri
+using the configured namespaces of LOCATION. Return the components as
+multiple value. If NAME is not qualified, the secondary and tertiary
+values are both nil."))
+
 (defgeneric name (location
 		  &key
 		  prefix?)
@@ -72,7 +79,9 @@ name is returned."))
 (defgeneric (setf name) (new-value location)
   (:documentation
    "Set NEW-VALUE as the local name of the node represented by
-LOCATION."))
+LOCATION. If NEW-VALUE is a qualified name of the form
+PREFIX:LOCAL-NAME, LOCATION has to have an entry for PREFIX in its
+namespace table."))
 
 (defgeneric val (location &key type)
   (:documentation
@@ -93,14 +102,18 @@ a string in that case."))
     (:documentation
      "Return the value of the attribute named NAME of the node
 represented by LOCATION. If TYPE is supplied, a type conversion may be
-performed. LOCATION has to represent an element node."))
+performed. LOCATION has to represent an element node. If NAME is a
+qualified name of the form PREFIX:LOCAL-NAME, LOCATION has to contain
+an entry for PREFIX in its namespace table."))
 
 (defgeneric (setf @) (new-value location name &key type)
   (:documentation
    "Set NEW-VALUE as the value of the attribute named NAME of the node
 represented by LOCATION. If TYPE is supplied, a type conversion may be
 performed prior to assigning the value. LOCATION has to represent an
-element node."))
+element node. If NAME is a qualified name of the form
+PREFIX:LOCAL-NAME, LOCATION has to contain an entry for PREFIX in its
+namespace table."))
 
 
 ;;; Dynamic Location Class Family

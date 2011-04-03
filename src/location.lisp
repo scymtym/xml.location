@@ -97,6 +97,17 @@ out on the node or nodes of the node set."))
   "Reset computed result of LOCATION when the path is changed."
   (evaluate! location))
 
+(defmethod location-attribute :around ((location location)
+				       (name     string)
+				       &rest args
+				       &key &allow-other-keys)
+  "Handle qualified attribute names."
+  (bind (((:values local-name _ uri)
+	  (maybe-decode-qname location name)))
+    (if uri
+	(apply #'call-next-method location local-name :uri uri args)
+	(call-next-method))))
+
 (defmethod compile! :before ((location location))
   "Check whether the XPath source is available."
   (unless (slot-value location 'path)
@@ -115,6 +126,31 @@ set."
   (with-slots (document compiled-path result) location
     (setf result (xpath:evaluate-compiled compiled-path document))))
 
+(defmethod maybe-decode-qname ((location location)
+			       (name     string))
+  "If NAME is qualified, decode it into local-name prefix and uri
+using the configured namespaces of LOCATION. Return the components as
+multiple value. If NAME is not qualified, the secondary and tertiary
+values are both nil."
+  (let ((index (position #\: name)))
+    (if index
+	(bind (((:slots-r/o namespaces) location)
+	       (env (xpath::make-dynamic-environment namespaces))
+	       ((:values local-name uri)
+		(xpath::decode-qname name env t)))
+	  (values local-name (subseq name 0 index) uri))
+	(values name nil nil))))
+
+(defmethod (setf name) :around ((new-value string)
+				(location  location))
+  "Determine whether NEW-VALUE is qualified and call and appropriate
+next method."
+  (bind (((:values local-name prefix uri)
+	  (maybe-decode-qname location new-value)))
+    (if uri
+	(setf (name location) (list local-name prefix uri))
+	(call-next-method))))
+
 (defmethod print-object ((object location) stream)
   (with-slots (document path) object
     (print-unreadable-object (object stream :type t :identity t)
@@ -123,20 +159,6 @@ set."
        document
        (cxml:make-character-stream-sink
 	stream :omit-xml-declaration-p t)))))
-
-(defmethod location-attribute :around ((location location)
-				       (name     string)
-				       &rest args
-				       &key &allow-other-keys)
-  "Handle qualified attribute names."
-  (let ((index (position #\: name)))
-    (if index
-	(bind (((:slots namespaces) location)
-	       (env (xpath::make-dynamic-environment namespaces))
-	       ((:values local-name namespace)
-		(xpath::decode-qname name env t)))
-	  (apply #'call-next-method location local-name :uri namespace args))
-	(call-next-method))))
 
 
 ;;; Utility Functions

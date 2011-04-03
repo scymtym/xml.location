@@ -42,13 +42,20 @@ have a name")
 
 (defmethod (setf name) ((new-value string)
 			(location  multi-location))
-  (let ((set-name (if (find #\: new-value)
-		       #'(lambda (item)
-			   (bind (((prefix local-name) (split-sequence #\: new-value)))
-			     (setf (stp:namespace-prefix item) prefix
-				   (stp:local-name item)       local-name)))
-		       #'(lambda (item) (setf (stp:local-name item) new-value)))))
-    (xpath:map-node-set->list set-name (location-result location)))
+  (xpath:map-node-set->list
+   #'(lambda (item) (setf (stp:local-name item) new-value))
+   (location-result location))
+  new-value)
+
+(defmethod (setf name) ((new-value list)
+			(location  multi-location))
+  (bind (((local-name prefix uri) new-value))
+    (xpath:map-node-set->list
+     #'(lambda (item)
+	 (setf (stp:namespace-uri    item) uri
+	       (stp:namespace-prefix item) prefix
+	       (stp:local-name       item) local-name))
+     (location-result location)))
   new-value)
 
 (defmethod val ((location multi-location)
