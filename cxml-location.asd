@@ -57,7 +57,8 @@
 			       :depends-on ("package" "conditions"
 					    "protocol"))
 			      (:file       "singleton-location"
-			       :depends-on ("package" "location"))
+			       :depends-on ("package" "types"
+					    "location"))
 			      (:file       "multi-location"
 			       :depends-on ("package" "location"))
 			      (:file       "create-missing-nodes-mixin"

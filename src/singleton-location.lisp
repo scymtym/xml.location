@@ -21,7 +21,7 @@
 
 (defclass singleton-location (location)
   ((if-no-match         :initarg  :if-no-match
-			:type     (member :error :do-nothing :create)
+			:type     if-no-match-policy-designator
 			:initform :error
 			:documentation
 			"Policy for the situation that the XPath
