@@ -78,7 +78,7 @@ of PATH."
 	 (final (lastcar path))
 	 (expanded (%expand-xpath-element final)))
     (mapcan #'(lambda (parent)
-		(apply #'%create-xpath-element parent expanded))
+		(apply #'create-xpath-element parent expanded))
 	    parents)))
 
 (defmethod no-applicable-method ((fuction (eql (fdefinition 'create-xpath-element)))
