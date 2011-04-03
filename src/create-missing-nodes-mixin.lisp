@@ -72,21 +72,19 @@ LOCATION."))
 (defmethod create-xpath ((document stp:node) (path list))
   "Walk along XPath PATH in DOCUMENT, creating missing nodes as they
 are encountered. "
-  (bind ((steps (iter (for e in (rest path))
-		      (collect `(xpath:xpath (:path ,e)))))
-	 ((:flet path-guts (expr))
-	  (lastcar (cdadr expr)))
-	 ((:labels one-step (location step &rest steps))
-	  (let* ((result (xpath:evaluate step location))
-		 (nodes  (if (xpath:node-set-empty-p result)
-			     (let ((spec (path-guts step)))
-			       (apply #'%create-xpath-element
-				      location (%expand-xpath-element spec)))
-			     (xpath:all-nodes result))))
-	    (when steps
-	      (map nil #'(lambda (n) (apply #'one-step n steps)) nodes)))))
+  (labels
+      ((one-step (location step &rest steps)
+	 (let* ((result (xpath:evaluate
+			 `(xpath:xpath (:path ,step)) location))
+		(nodes  (if (xpath:node-set-empty-p result)
+			    (apply #'%create-xpath-element
+				   location (%expand-xpath-element step))
+			    (xpath:all-nodes result))))
+	   (if steps
+	       (mapcan #'(lambda (n) (apply #'one-step n steps)) nodes)
+	       nodes))))
+    (apply #'one-step document (rest path))))
 
-    (apply #'one-step document steps)))
 
 (defmethod %create-xpath-element ((location  t)
 				  (type      t)
@@ -172,7 +170,7 @@ are encountered. "
 ;;; Utility functions
 ;;
 
-(declaim (ftype (function (list) (cons t (cons t (cons t null))))
+(declaim (ftype (function (list) (list-of-length 3))
 		%expand-xpath-element)
 	 (inline %expand-xpath-element))
 

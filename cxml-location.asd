@@ -62,7 +62,8 @@
 			      (:file       "multi-location"
 			       :depends-on ("package" "location"))
 			      (:file       "create-missing-nodes-mixin"
-			       :depends-on ("package" "location"))
+			       :depends-on ("package" "types"
+					    "location"))
 			      (:file       "conversion"
 			       :depends-on ("package" "protocol"))
 			      (:file       "construction"
