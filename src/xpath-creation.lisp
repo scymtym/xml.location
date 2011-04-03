@@ -28,7 +28,13 @@
    "Ensure that the nodes referenced in PATH actually exist in
 DOCUMENT, creating them if necessary."))
 
-(defgeneric %create-xpath-element (location type name predicate)
+(defgeneric create-xpath-sibling (document path)
+  (:documentation
+   "Create a \"sibling\" path of PATH by duplicating the node
+designated by PATH and appending the result to the children of the
+parent of the node designated by PATH."))
+
+(defgeneric create-xpath-element (location type name predicate)
   (:documentation
    "Create the XPath element designated by TYPE, NAME and PREDICATE in
 LOCATION."))
@@ -49,7 +55,7 @@ are encountered. "
 	 (let* ((result (xpath:evaluate
 			 `(xpath:xpath (:path ,step)) location))
 		(nodes  (if (xpath:node-set-empty-p result)
-			    (apply #'%create-xpath-element
+			    (apply #'create-xpath-element
 				   location (%expand-xpath-element step))
 			    (xpath:all-nodes result))))
 	   (if steps
@@ -57,9 +63,27 @@ are encountered. "
 	       nodes))))
     (apply #'one-step document (rest path))))
 
-(defmethod no-applicable-method ((fuction (eql (fdefinition '%create-xpath-element)))
+(defmethod create-xpath-sibling ((document stp:node) (path string))
+  "Parse XPath and process parsed representation."
+  (create-xpath-sibling document (xpath:parse-xpath path)))
+
+(defmethod create-xpath-sibling ((document stp:node) (path list))
+  "Potentially create XPath PATH in DOCUMENT except for the final
+element. Then unconditionally create a node matching the final element
+of PATH."
+  (let* ((butlast (butlast (rest path)))
+	 (parents (if butlast
+		      (create-xpath document `(:path ,@butlast))
+		      (list document)))
+	 (final (lastcar path))
+	 (expanded (%expand-xpath-element final)))
+    (mapcan #'(lambda (parent)
+		(apply #'%create-xpath-element parent expanded))
+	    parents)))
+
+(defmethod no-applicable-method ((fuction (eql (fdefinition 'create-xpath-element)))
 				 &rest args)
-  "Signal an error if no `%create-xpath-element' method is
+  "Signal an error if no `create-xpath-element' method is
 applicable."
   (bind (((location type name predicate) args))
     (error 'xpath-creation-error
@@ -68,19 +92,19 @@ applicable."
 	   :name      name
 	   :predicate predicate)))
 
-(defmethod %create-xpath-element ((location  stp:element)
+(defmethod create-xpath-element ((location  stp:element)
 				  (type      (eql :child))
 				  (name      (eql :node))
 				  (predicate t))
-  (%create-xpath-element location type "somenode" predicate))
+  (create-xpath-element location type "somenode" predicate))
 
-(defmethod %create-xpath-element ((location  stp:element)
+(defmethod create-xpath-element ((location  stp:element)
 				  (type      (eql :child))
 				  (name      (eql '*))
 				  (predicate t))
-  (%create-xpath-element location type "somenode" predicate))
+  (create-xpath-element location type "somenode" predicate))
 
-(defmethod %create-xpath-element ((location  stp:element)
+(defmethod create-xpath-element ((location  stp:element)
 				  (type      (eql :child))
 				  (name      (eql :text))
 				  (predicate (eql nil)))
@@ -88,7 +112,7 @@ applicable."
     (stp:append-child location child)
     (list child)))
 
-(defmethod %create-xpath-element :around ((location  stp:element)
+(defmethod create-xpath-element :around ((location  stp:element)
 					  (type      (eql :child))
 					  (name      t)
 					  (predicate integer))
@@ -100,9 +124,9 @@ applicable."
 	   :predicate        predicate
 	   :format-control   "~@<Cannot create child node at position ~A.~@:>"
 	   :format-arguments `(,predicate)))
-  (%create-xpath-element location type name nil))
+  (create-xpath-element location type name nil))
 
-(defmethod %create-xpath-element ((location  stp:element)
+(defmethod create-xpath-element ((location  stp:element)
 				  (type      (eql :child))
 				  (name      string)
 				  (predicate (eql nil)))
@@ -110,7 +134,7 @@ applicable."
     (stp:append-child location child)
     (list child)))
 
-(defmethod %create-xpath-element ((location  stp:element)
+(defmethod create-xpath-element ((location  stp:element)
 				  (type      (eql :child))
 				  (name      list)
 				  (predicate (eql nil)))
@@ -130,7 +154,7 @@ component list: ~S.~@:>"
       (stp:append-child location child)
       (list child))))
 
-(defmethod %create-xpath-element ((location  stp:element)
+(defmethod create-xpath-element ((location  stp:element)
 				  (type      (eql :attribute))
 				  (name      string)
 				  (predicate (eql nil)))
