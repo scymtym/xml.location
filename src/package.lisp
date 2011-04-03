@@ -20,6 +20,9 @@
 (in-package :cl-user)
 
 (defpackage :cxml-location
+  (:nicknames
+   :xloc)
+
   (:use
    :cl
    :alexandria
