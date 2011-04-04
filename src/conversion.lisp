@@ -188,7 +188,8 @@ text.~@:>"
 (defmethod ->xml ((value t) (dest (eql nil)) (type (eql 'string))
 		  &key &allow-other-keys)
   "Convert VALUE to requested type string by `prin1'ing it."
-  (prin1-to-string value))
+  (with-standard-io-syntax
+    (prin1-to-string value)))
 
 (defmethod ->xml ((value string) (dest (eql nil)) (type (eql 'string))
 		  &key &allow-other-keys)
@@ -198,7 +199,8 @@ text.~@:>"
 (defmethod ->xml ((value sequence) (dest (eql nil)) (type (eql 'string))
 		  &key &allow-other-keys)
   "Convert sequence VALUE to string by `format'ting."
-  (format nil "~{~S~^ ~}" (coerce value 'list)))
+  (with-standard-io-syntax
+    (format nil "~{~S~^ ~}" (coerce value 'list))))
 
 
 ;;; Utility functions
