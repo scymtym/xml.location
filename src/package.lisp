@@ -108,7 +108,8 @@
    :singleton-location
    :multi-location
    :create-missing-nodes-mixin
-   :ignore-empty-results-mixin)
+   :ignore-empty-results-mixin
+   :append-nodes-mixin)
 
   ;; Macros
   (:export

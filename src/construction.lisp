@@ -24,12 +24,13 @@
 		&key
 		(if-multiple-matches :error)
 		(if-no-match         :error)
+		(assign-mode         :replace)
 		&allow-other-keys)
   "Create a location for DOCUMENT and PATH. The class of the location
 instance is determined based on the values of IF-MULTIPLE-MATCHES and
 IF-NO-MATCH."
   ;; The keyword arguments are just there to document the interface.
-  (declare (ignore if-multiple-matches if-no-match))
+  (declare (ignore if-multiple-matches if-no-match assign-mode))
 
   ;; Create the location instance
   (bind (((:values class args) (apply #'%compute-location-class args)))
@@ -57,6 +58,7 @@ IF-NO-MATCH."
 			   &key
 			   (:if-multiple-matches if-multiple-matches-policy-designator)
 			   (:if-no-match         if-no-match-policy-designator)
+			   (:assign-mode         assign-mode-designator)
 			   &allow-other-keys)
 			  (values class list))
 		%compute-location-class))
@@ -65,11 +67,20 @@ IF-NO-MATCH."
 				&key
 				(if-multiple-matches :error)
 				(if-no-match         :error)
+				(assign-mode         :replace)
 				&allow-other-keys)
   "Compute a location class based on the values of IF-MULTIPLE-MATCHES
 and IF-NO-MATCH. This is a separate function to make it usable in
 compiler macros."
   (let ((mixins))
+
+    ;; Assign mode
+    (ecase assign-mode
+      (:append
+       (push 'append-nodes-mixin mixins)
+       (setf if-multiple-matches :all))
+      (:replace))
+    (remove-from-plistf args :assign-mode)
 
     ;; Multiple matches policy
     (ecase if-multiple-matches

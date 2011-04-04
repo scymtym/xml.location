@@ -139,6 +139,7 @@ classes as its superclasses. Typical location mixin classes are:
 		 namespaces
 		 if-no-match
 		 if-multiple-matches
+		 assign-mode
 		 &allow-other-keys)
   (:documentation
    "Construct and return a new `location' instance that represents the
@@ -157,6 +158,11 @@ IF-MULTIPLE-MATCHES specifies the policy for dealing with the
 situation that the node set produced by evaluating PATH on DOCUMENT
 consists of multiple nodes. Valid values are :error, :first, :any and
 last.
+
+ASSIGN-MODE specifies the semantics of assigning values to `val'
+places of the location. If ASSIGN-MODE is :set, the new value replaces
+the previous value. If ASSIGN-MODE is :append, the new value is stored
+in a newly appended sibling location.
 
 The type of the returned `location' instance can depend on the
 arguments but is a sub-type of `location'."))
