@@ -22,6 +22,43 @@
 
 ;;; XML -> * Conversions
 ;;
+;; There are two main paths for this conversion:
+;;
+;; 1. {Attribute,text} node -> string [ -> final type ]
+;;    This conversion is partially implemented via some of the
+;;    following methods. For final types other than string, there are
+;;    two possibilities:
+;;
+;;    a) A `read'able representation of the value has been stored
+;;       In this case, the conversion to the final type just uses
+;;       `read'.
+;;
+;;    b) A conversion method has to be written
+;;       Such a conversion method can be written like this:
+;;
+;;       (defmethod xml-> ((value t) (type MY-TYPE))
+;;         (let ((string (xml-> value 'string)))
+;;           (my-conversion string)))
+;;
+;; 2. Element node -> final type
+;;
+;;    This conversion is mostly used for more complex types that
+;;    require a structured representation. For classes, methods should
+;;    specialize `xml->' on the actual class, not its name. This
+;;    allows instances as the second argument of `xml->'. The creation
+;;    of instances can be handled automatically (see remark below) so
+;;    that just specifying a class name as TYPE still works.
+;;
+;;    Obviously, this cannot be done if the actual class is determined
+;;    by means of inspecting VALUE. In such cases, the name of a
+;;    common superclass of another distinctive symbol should be used
+;;    as specializer.
+;;
+;; In addition, there is the following rule: If TYPE is a symbol other
+;; than 'string, 'list or any other type that is either `read'able or
+;; specializes `xml->', TYPE is taken to designate a class. In that
+;; case, `make-instance' is called with TYPE and `xml->' is called
+;; with the resulting instance as TYPE.
 
 (defmethod no-applicable-method ((function (eql (fdefinition 'xml->)))
 				 &rest args)
@@ -51,6 +88,8 @@ found."
      (xml-> value (first type)))
     (t
      (xml-> value (first type) :inner-types (rest type)))))
+
+;; Case 1 methods
 
 (defmethod xml-> ((value stp:text) (type t)
 		  &rest args
@@ -115,9 +154,57 @@ text.~@:>"
      (map 'list (rcurry #'xml-> inner-types)
 	  (%split-at-whitespace value)))))
 
+;; Case 2 methods
+
+(defmethod xml-> ((value stp:element) (type class)
+		  &key &allow-other-keys)
+  "Interpret TYPE as a class name. Try to create an instance and load
+the contents of VALUE into that instance."
+  (xml-> value (make-instance type)))
+
+(defmethod xml-> ((value stp:element) (type symbol)
+		  &key &allow-other-keys)
+  "Interpret TYPE as a class name. Try to create an instance and load
+the contents of VALUE into that instance."
+  (let ((class (find-class type nil)))
+    (unless class
+      (error 'xml->-conversion-error
+	     :value value
+	     :type  type
+	     :format-control   "~@<Since there is no ~S method ~
+specialized on the symbol ~S, it is interpreted as a class name, but ~
+there is no class of that name.~@:>"
+	     :format-arguments `(xml-> ,type)))
+    (xml-> value class)))
+
 
 ;;; * -> XML Conversions
 ;;
+;; There are two main paths for this conversion (this is mostly
+;; analogous to the mechanics of `xml->')
+;;
+;; 1. VALUE -> nil                   DEST with 'string TYPE
+;;          -> {text,attribute} node DEST with 'string TYPE
+;;    This conversion is partially implemented via some of the
+;;    following methods. For types other than string, there are two
+;;    possibilities:
+;;
+;;    a) The type of VALUE has a `read'able print representation. In
+;;       this case, the conversion to the final type just uses
+;;       `prin1'.
+;;
+;;    b) A conversion method has to be written
+;;       Such a conversion method can be written like this:
+;;
+;;       (defmethod ->xml ((value MY-TYPE) (dest (eql nil)) (type (eql 'string)))
+;;         (my-to-string-conversion value))
+;;
+;; 2. VALUE -> element node DEST with arbitrary TYPE
+;;    This conversion is mostly used for more complex types that
+;;    require a structured representation. The value of TYPE is only
+;;    relevant if more than one way to store objects of a given type
+;;    is implemented. Otherwise, dispatching on VALUE is sufficient to
+;;    select the appropriate method.
 
 (defmethod no-applicable-method ((function (eql (fdefinition '->xml)))
 				 &rest args)
@@ -149,6 +236,8 @@ found."
      (->xml value dest (first type)))
     (t
      (->xml value dest (first type) :inner-types (rest type)))))
+
+;; Case 1 methods
 
 (defmethod ->xml ((value t) (dest stp:text) (type t)
 		  &key &allow-other-keys)
