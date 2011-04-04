@@ -77,7 +77,8 @@ compiler macros."
     ;; Assign mode
     (ecase assign-mode
       (:append
-       (push 'append-nodes-mixin mixins)
+       (pushnew 'multi-location mixins)
+       (pushnew 'append-nodes-mixin mixins) ;; ensure precedence
        (setf if-multiple-matches :all))
       (:replace))
     (remove-from-plistf args :assign-mode)
@@ -85,17 +86,17 @@ compiler macros."
     ;; Multiple matches policy
     (ecase if-multiple-matches
       ((:error :first :last :any)
-       (push 'singleton-location mixins))
+       (pushnew 'singleton-location mixins))
       (:all
-       (push 'multi-location mixins)
+       (pushnew 'multi-location mixins)
        (remove-from-plistf args :if-multiple-matches :if-no-match)))
 
     ;; No match policy
     (ecase if-no-match
       (:create
-       (push 'create-missing-nodes-mixin mixins))
+       (pushnew 'create-missing-nodes-mixin mixins))
       (:do-nothing
-       (push 'ignore-empty-result-mixin mixins))
+       (pushnew 'ignore-empty-result-mixin mixins))
       (:error))
 
     ;; Return the class and initargs
