@@ -29,7 +29,7 @@ and reading elements from a text child node."
   (with-locations-r/o (((:@   rows         :type 'number)        ".")
 		       ((:@   cols         :type 'number)        ".")
 		       ((:@   element-type :type 'symbol)        ".") ;; TODO what about (complex double-float)?
-		       ((:val text         :type '(list number)) "text()"))
+		       ((:val text         :type '(list number)) "text()[last()]"))
       value
 
     (let* ((class  (case element-type
