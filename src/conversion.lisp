@@ -156,13 +156,13 @@ text.~@:>"
 
 ;; Case 2 methods
 
-(defmethod xml-> ((value stp:element) (type class)
+(defmethod xml-> ((value stp:node) (type class)
 		  &key &allow-other-keys)
   "Interpret TYPE as a class name. Try to create an instance and load
 the contents of VALUE into that instance."
   (xml-> value (make-instance type)))
 
-(defmethod xml-> ((value stp:element) (type symbol)
+(defmethod xml-> ((value stp:node) (type symbol)
 		  &key &allow-other-keys)
   "Interpret TYPE as a class name. Try to create an instance and load
 the contents of VALUE into that instance."
