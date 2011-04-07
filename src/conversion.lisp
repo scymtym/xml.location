@@ -309,5 +309,5 @@ text.~@:>"
 (defun %split-at-whitespace (string)
   (nth-value 0 (split-sequence:split-sequence-if
 		#'(lambda (c) (or (eq c #\Space)
-				  (eq C #\Newline)))
+				  (eq c #\Newline)))
 		string :remove-empty-subseqs t)))
