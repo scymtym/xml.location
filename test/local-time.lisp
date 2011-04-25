@@ -58,6 +58,11 @@ conversions.")
   (ensure-condition 'xml->-conversion-error
     (val now-loc :type '(local-time:timestamp :some-inner-type)))
 
+  ;; For both directions
+  (ensure-condition '->xml-conversion-error
+    (setf (val empty-loc :type '(local-time:timestamp :some-inner-type))
+	  now))
+
   ;; Two invalid timestamp values.
   (let ((loc (loc "<foo ts='invalid timestamp'/>" "node()/@ts")))
     (ensure-condition 'xml->-conversion-error
