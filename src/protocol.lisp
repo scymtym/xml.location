@@ -171,12 +171,16 @@ arguments but is a sub-type of `location'."))
 ;;; Conversion Protocol
 ;;
 
-(defgeneric xml-> (value type &key inner-types)
+(defgeneric xml-> (value type
+		   &key
+		   inner-types)
   (:documentation
    "Convert VALUE to the type designated by TYPE and, possibly
 INNER-TYPES. The result of the conversion is returned."))
 
-(defgeneric ->xml (value dest type &key inner-types)
+(defgeneric ->xml (value dest type
+		   &key
+		   inner-types)
   (:documentation
    "Convert VALUE to a suitable type and store the result of the
 conversion in the XML node DEST. Should return VALUE."))
