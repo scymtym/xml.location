@@ -153,7 +153,7 @@ and ARGS. Return two values:
   (if (not (symbolp (first spec)))
       (call-next-method)
       (apply #'%parse-access-spec
-	     (intern (string (first spec)) :keyword)
+	     (make-keyword (first spec))
 	     :inner-specs (rest spec)
 	     args)))
 
