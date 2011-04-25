@@ -153,8 +153,8 @@ next method."
 
 (defmethod print-object ((object location) stream)
   (with-slots (document path) object
-    (print-unreadable-object (object stream :type t :identity t)
-      (format stream "~A in " path)
+    (print-unreadable-object (object stream :identity t)
+      (format stream "~A ~A in " (class-name (class-of object)) path)
       (stp:serialize
        document
        (cxml:make-character-stream-sink
