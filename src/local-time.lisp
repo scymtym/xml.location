@@ -46,4 +46,20 @@ start with '@'.~@:>"
 
   (local-time:parse-timestring (subseq value 1) :fail-on-error t))
 
-;; we get ->xml for free via prin1ing in this case
+;; we get the primary ->xml method for free via prin1ing in this case
+
+(defmethod ->xml :before  ((value local-time:timestamp)
+			   (dest  t)
+			   (type  (eql 'local-time:timestamp))
+			   &key
+			   inner-types
+			   &allow-other-keys)
+  "Signal an error when INNER-TYPES are supplied."
+  (when inner-types
+    (error '->xml-conversion-error
+	   :value            value
+	   :destination      dest
+	   :type             type
+	   :format-control   "~@<The type ~S does not have inner types, ~
+but ~S has been specified as inner types.~@:>"
+	   :format-arguments `(,type ,inner-types))))
