@@ -72,6 +72,7 @@ found."
 
 (defmethod xml-> ((value t) (type list)
 		  &key &allow-other-keys)
+  "Intended mainly to catch the case in which TYPE is nil."
   (xml->-conversion-error
    value type
    "~@<~S is not valid as a type specification.~@:>"
@@ -218,6 +219,7 @@ found."
 
 (defmethod ->xml ((value t) (dest t) (type list)
 		  &key &allow-other-keys)
+  "Intended mainly to catch the case in which TYPE is nil."
   (->xml-conversion-error
    value type dest
    "~@<~S is not valid as a type specification.~@:>"
