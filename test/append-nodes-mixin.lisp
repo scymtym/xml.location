@@ -32,8 +32,8 @@
 
   (let ((loc (loc "<foo/>" "foo/bar/text()"
 		  :assign-mode :append)))
-    (setf (val loc) "hello")
-    (setf (val loc) " world")
+    (setf (val loc) "hello"
+	  (val loc) " world")
     (ensure-same
      (first (val loc :type 'string)) "hello world"
      :test #'string=))
