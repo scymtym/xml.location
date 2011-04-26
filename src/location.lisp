@@ -29,10 +29,8 @@
 		  :accessor location-document
 		  :documentation
 		  "The XML document to which the location refers.")
-   (namespaces    :initarg  :namespaces
-		  :type     list
+   (namespaces    :type     list
 		  :accessor location-namespaces
-		  :initform xpath::*initial-namespaces*
 		  :documentation
 		  "An alist of namespaces that should be available in
 the XPath of the location.")
@@ -55,6 +53,8 @@ location.")
 		  :documentation
 		  "The node-set produced by evaluating the XPath of
 the location to the document of the location."))
+  (:default-initargs
+   :namespaces xpath::*initial-namespaces*)
   (:documentation
    "A location consists of an XML document and an XPath that refers to
 nodes in the document. Technically the location uses the node set
@@ -63,11 +63,13 @@ representation of this relation. Operation on the location are carried
 out on the node or nodes of the node set."))
 
 (defmethod initialize-instance ((instance location)
-				&key)
+				&key
+				namespaces)
   (call-next-method)
   ;; Augment the list of namespaces if necessary. We do this as early
   ;; as possible.
-  (%maybe-add-default-namespaces instance))
+  (setf (slot-value instance 'namespaces)
+	(%maybe-add-default-namespaces namespaces)))
 
 (defmethod initialize-instance :after ((instance location)
 				       &key)
@@ -164,11 +166,10 @@ next method."
 ;;; Utility Functions
 ;;
 
-(defun %maybe-add-default-namespaces (location)
+(defun %maybe-add-default-namespaces (namespaces)
   "Add default namespaces as defined by `xpath::*dynamic-namespaces*'
-to the slot-value of slot namespaces in LOCATION."
-  (with-slots (namespaces) location
-    (when (member '&default namespaces)
-      (setf namespaces
-	    (append xpath::*dynamic-namespaces*
-		    (remove '&default namespaces))))))
+to NAMESPACES."
+    (if (member '&default namespaces)
+	(append xpath::*dynamic-namespaces*
+		(remove '&default namespaces))
+	namespaces))
