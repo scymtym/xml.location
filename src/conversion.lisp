@@ -149,6 +149,11 @@ XPath if you intended to extract an element's text.~@:>"
      (map 'list (rcurry #'xml-> inner-types)
 	  (%split-at-whitespace value)))))
 
+(defmethod xml-> ((value string) (type (eql 'type))
+		  &key &allow-other-keys)
+  "Convert string VALUE to a Common Lisp type."
+  (nth-value 0 (read-from-string value)))
+
 ;; Case 2 methods
 
 (defmethod xml-> ((value stp:node) (type class)
@@ -279,6 +284,12 @@ XPath if you intended to write an element's text.~@:>"
   "Convert sequence VALUE to string by `format'ting."
   (with-standard-io-syntax
     (format nil "~{~S~^ ~}" (coerce value 'list))))
+
+(defmethod ->xml ((value list) (dest (eql 'string)) (type (eql 'type))
+		  &key &allow-other-keys)
+  "Convert VALUE to string by `prin1'ing it."
+  (with-standard-io-syntax
+    (prin1-to-string value)))
 
 
 ;;; Utility functions

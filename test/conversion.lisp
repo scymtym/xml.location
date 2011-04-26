@@ -25,11 +25,12 @@
    "Root test suite for conversion tests."))
 
 (deftestsuite xml->-root (conversion-root)
-  ((cases '(("string" string        "string")
-	    ("5"      real          5)
-	    ("5"      (real)        5)
-	    (":a :b"  list          (":a" ":b"))
-	    (":a :b"  (list symbol) (:a :b)))))
+  ((cases '(("string"                 string        "string")
+	    ("5"                      real          5)
+	    ("5"                      (real)        5)
+	    (":a :b"                  list          (":a" ":b"))
+	    (":a :b"                  (list symbol) (:a :b))
+	    ("(COMPLEX DOUBLE-FLOAT)" type          (complex double-float)))))
   (:function
    (check-xml->-conversion (value type expected)
      (let ((result (xml-> value type)))
@@ -71,12 +72,13 @@ produced ~S, not ~S.~@:>"
     (xml-> (stp:make-element "value") 'string)))
 
 (deftestsuite ->xml-root (conversion-root)
-  ((cases '(("string"    string "string")
-	    (5           string "5")
-	    ((":a" ":b") string "\":a\" \":b\"")
-	    ((:a :b)     string ":A :B"))))
+  ((cases '(("string"               string "string")
+	    (5                      string "5")
+	    ((":a" ":b")            string "\":a\" \":b\"")
+	    ((:a :b)                string ":A :B")
+	    ((complex double-float) type   "(COMPLEX DOUBLE-FLOAT)"))))
   (:function
-   (check-->xml-conversion (value type dest expected)
+   (check-->xml-conversion (value dest type expected)
      (let ((result (->xml value dest type)))
        (ensure-same
 	result expected
@@ -85,7 +87,7 @@ produced ~S, not ~S.~@:>"
 with type ~S produced ~S, not ~S.~@:>"
 	:arguments (value dest type result expected)))))
   (:function
-   (check-->xml-conversion-node (value type dest expected)
+   (check-->xml-conversion-node (value dest type expected)
      (let ((result (->xml value dest type)))
        (ensure-same
 	result value
@@ -110,9 +112,9 @@ with type ~S produced ~S, not ~S.~@:>"
   (iter (for (value type expected) in cases)
 	(check-->xml-conversion value 'string type expected)
 	(check-->xml-conversion-node
-	 value type (stp:make-text "") expected)
+	 value (stp:make-text "") type expected)
 	(check-->xml-conversion-node
-	 value type (stp:make-attribute "" "foo") expected)))
+	 value (stp:make-attribute "" "foo") type expected)))
 
 (addtest (->xml-root
           :documentation
