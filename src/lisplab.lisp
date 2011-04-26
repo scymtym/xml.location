@@ -19,6 +19,10 @@
 
 (in-package :cxml-location)
 
+
+;;; XML -> conversion
+;;
+
 (defmethod xml-> ((value stp:element)
 		  (type  (eql 'lisplab:matrix-base))
 		  &key
@@ -32,13 +36,15 @@ and reading elements from a text child node."
 		       ((:val text         :type '(list number)) "text()[last()]"))
       value
 
-    (let* ((class  (case element-type
-		     (double-float           'lisplab:matrix-dge)
-		     ((complex double-float) 'lisplab:matrix-zge)
-		     (t                      'lisplab:matrix-ge)))
+    (let* ((class  (%element-type->matrix-class
+		    (or (first inner-types) element-type)))
 	   (result (lisplab:mnew class 0 rows cols)))
       (lisplab:import-list result text)
       result)))
+
+
+;;; -> XML conversion
+;;
 
 (defmethod ->xml :before ((value lisplab:matrix-base)
 			  (dest  stp:element)
@@ -46,6 +52,8 @@ and reading elements from a text child node."
 			  &key
 			  inner-types
 			  &allow-other-keys)
+  ;; When INNER-TYPES is supplied, make sure that the specified
+  ;; element type is a subtype of the actual element type.
   (when inner-types
     (unless (subtypep (first inner-types)
 		      (lisplab:element-type value))
@@ -75,3 +83,18 @@ attributes and using a text child node for the elements."
 	    element-type element-type1
 	    text         (lisplab:export-list value))))
   value)
+
+
+;;; Utility functions
+;;
+
+(defun %element-type->matrix-class (element-type)
+  "Map ELEMENT-TYPE to a matrix class with general structure and ffi
+implementation, if possible."
+  (cond
+    ((eq element-type 'double-float)
+     'lisplab:matrix-dge)
+    ((equal element-type '(complex double-float))
+     'lisplab:matrix-zge)
+    (t
+     'lisplab:matrix-ge)))
