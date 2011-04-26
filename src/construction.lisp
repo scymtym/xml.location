@@ -54,7 +54,7 @@ IF-NO-MATCH."
 ;;; Utility Functions
 ;;
 
-(declaim (ftype (function (&rest list
+(declaim (ftype (function (&rest t
 			   &key
 			   (:if-multiple-matches if-multiple-matches-policy-designator)
 			   (:if-no-match         if-no-match-policy-designator)
