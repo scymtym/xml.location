@@ -97,10 +97,8 @@ found."
   (apply #'xml-> (stp:data value) type args))
 
 (defmethod xml-> ((value stp:text) (type (eql 'string))
-		  &rest args
 		  &key &allow-other-keys)
   "Fast-path method for text nodes if TYPE is string."
-  (declare (ignore args))
   (stp:data value))
 
 (defmethod xml-> ((value stp:attribute) (type t)
