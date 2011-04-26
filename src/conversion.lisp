@@ -51,8 +51,8 @@
 ;;
 ;;    Obviously, this cannot be done if the actual class is determined
 ;;    by means of inspecting VALUE. In such cases, the name of a
-;;    common superclass of another distinctive symbol should be used
-;;    as specializer.
+;;    common superclass or some other distinctive symbol should be
+;;    used as specializer.
 ;;
 ;; In addition, there is the following rule: If TYPE is a symbol other
 ;; than 'string, 'list or any other type that is either `read'able or
