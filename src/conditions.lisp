@@ -237,6 +237,16 @@ Lisp object with type ~S~@:>"
    "This error is signaled when converting an XML location into a Lisp
 object with a certain type fails."))
 
+(defun xml->-conversion-error (value type &optional format-control
+			       &rest format-arguments)
+  "Signal an `xml->-conversion-error' with data VALUE and TYPE and
+optional FORMAT-CONTROL and FORMAT-ARGUMENTS."
+  (error 'xml->-conversion-error
+	 :value            value
+	 :type             type
+	 :format-control   format-control
+	 :format-arguments format-arguments))
+
 (define-condition no-xml->-conversion-method (xml->-conversion-error
 					      no-conversion-method-mixin)
   ((function :initform 'xml->))
@@ -270,6 +280,18 @@ destination ~S with type ~S~@:>"
   (:documentation
    "This error is signaled when storing a value into an XML location
 with a certain type fails."))
+
+(defun ->xml-conversion-error (value type destination
+			       &optional format-control
+			       &rest format-arguments)
+  "Signal an `->xml-conversion-error' with data VALUE, TYPE and
+DESTINATION and optional FORMAT-CONTROL and FORMAT-ARGUMENTS."
+  (error '->xml-conversion-error
+	 :value            value
+	 :type             type
+	 :destination      destination
+	 :format-control   format-control
+	 :format-arguments format-arguments))
 
 (define-condition no-->xml-conversion-method (->xml-conversion-error
 					      no-conversion-method-mixin)

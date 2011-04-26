@@ -37,38 +37,29 @@ error if dimensions or element type are incompatible."
     ;; Check compatibility of dimensions.
     (unless (and (= (lisplab:rows type) rows)
 		 (= (lisplab:cols type) cols))
-      (error 'xml->-conversion-error
-	     :value            value
-	     :type             type
-	     :format-control   "~@<The stored matrix dimensions, ~D x ~
-~D, do not match the dimensions ~D x ~D of the supplied destination ~
-matrix.~@:>"
-	     :format-arguments (list rows cols
-				     (lisplab:rows type)
-				     (lisplab:cols type))))
+      (xml->-conversion-error
+       value type
+       "~@<The stored matrix dimensions, ~D x ~D, do not match the ~
+dimensions ~D x ~D of the supplied destination matrix.~@:>"
+       rows cols (lisplab:rows type) (lisplab:cols type)))
 
     ;; Check compatibility of element types.
     (unless (subtypep element-type (lisplab:element-type type))
-      (error 'xml->-conversion-error
-	     :value            value
-	     :type             type
-	     :format-control   "~@<The stored element type ~S is not a ~
-subtype of the element type ~S of the supplied destination ~
-matrix.~@:>"
-	     :format-arguments (list element-type
-				     (lisplab:element-type type))))
+      (xml->-conversion-error
+       value type
+       "~@<The stored element type ~S is not a subtype of the element ~
+type ~S of the supplied destination matrix.~@:>"
+       element-type (lisplab:element-type type)))
 
     ;; Check number of matrix elements, import if ok.
     (let ((elements text))
       (unless (length= (the non-negative-integer (* rows cols))
 		       elements)
-	(error 'xml->-conversion-error
-	       :value            value
-	       :type             type
-	       :format-control   "~@<The number of stored elements, ~D, ~
-does not match the number of elements, ~D, of the supplied destination ~
-matrix.~@:>"
-	       :format-arguments (list (length elements) (* rows cols))))
+	(xml->-conversion-error
+	 value type
+	 "~@<The number of stored elements, ~D, ~ does not match the ~
+number of elements, ~D, of the supplied destination ~ matrix.~@:>"
+	 (length elements) (* rows cols)))
 
       (lisplab:import-list type elements))
 

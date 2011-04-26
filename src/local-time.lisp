@@ -29,20 +29,17 @@
 		  &allow-other-keys)
   "Deserialize timestamp from VALUE."
   (when inner-types
-    (error 'xml->-conversion-error
-	   :value            value
-	   :type             type
-	   :format-control   "~@<The type ~S does not have inner types, ~
-but ~S has been specified as inner types.~@:>"
-	   :format-arguments `(,type ,inner-types)))
+    (xml->-conversion-error
+     value type
+     "~@<The type ~S does not have inner types, but ~S has been ~
+specified as inner types.~@:>"
+     type inner-types))
 
   (unless (eq (aref value 0) #\@)
-    (error 'xml->-conversion-error
-	   :value            value
-	   :type             type
-	   :format-control   "~@<Serialized timestamp value ~S does not ~
-start with '@'.~@:>"
-	   :format-arguments `(,value)))
+    (xml->-conversion-error
+     value type
+     "~@<Serialized timestamp value ~S does not start with '@'.~@:>"
+     value))
 
   (local-time:parse-timestring (subseq value 1) :fail-on-error t))
 
@@ -56,10 +53,8 @@ start with '@'.~@:>"
 			   &allow-other-keys)
   "Signal an error when INNER-TYPES are supplied."
   (when inner-types
-    (error '->xml-conversion-error
-	   :value            value
-	   :destination      dest
-	   :type             type
-	   :format-control   "~@<The type ~S does not have inner types, ~
-but ~S has been specified as inner types.~@:>"
-	   :format-arguments `(,type ,inner-types))))
+    (->xml-conversion-error
+     value type dest
+     "~@<The type ~S does not have inner types, but ~S has been ~
+specified as inner types.~@:>"
+     type inner-types)))

@@ -72,11 +72,10 @@ found."
 
 (defmethod xml-> ((value t) (type list)
 		  &key &allow-other-keys)
-  (error 'xml->-conversion-error
-	 :value            value
-	 :type             type
-	 :format-control   "~@<~S is not valid as a type specification.~@:>"
-	 :format-arguments `(,type)))
+  (xml->-conversion-error
+   value type
+   "~@<~S is not valid as a type specification.~@:>"
+   type))
 
 (defmethod xml-> :around ((value t) (type list)
 			  &key &allow-other-keys)
@@ -119,13 +118,11 @@ found."
 		  &key &allow-other-keys)
   "Catch-all method for STP nodes that have no obvious string
 interpretation."
-  (error 'xml->-conversion-error
-	 :value            value
-	 :type             type
-	 :format-control   "~@<Cannot extract a string from a ~A node; ~
-Append /text() to the XPath if you intended to extract an element's ~
-text.~@:>"
-	 :format-arguments `(,(type-of value))))
+  (xml->-conversion-error
+   value type
+   "~@<Cannot extract a string from a ~A node; Append /text() to the ~
+XPath if you intended to extract an element's text.~@:>"
+   (type-of value)))
 
 (defmethod xml-> ((value string) (type t)
 		  &key &allow-other-keys)
@@ -168,13 +165,12 @@ the contents of VALUE into that instance."
 the contents of VALUE into that instance."
   (let ((class (find-class type nil)))
     (unless class
-      (error 'xml->-conversion-error
-	     :value value
-	     :type  type
-	     :format-control   "~@<Since there is no ~S method ~
-specialized on the symbol ~S, it is interpreted as a class name, but ~
-there is no class of that name.~@:>"
-	     :format-arguments `(xml-> ,type)))
+      (xml->-conversion-error
+       value type
+       "~@<Since there is no ~S method specialized on the symbol ~S, ~
+it is interpreted as a class name, but there is no class of that ~
+name.~@:>"
+       'xml-> type))
     (xml-> value class)))
 
 
@@ -219,12 +215,10 @@ found."
 
 (defmethod ->xml ((value t) (dest t) (type list)
 		  &key &allow-other-keys)
-  (error '->xml-conversion-error
-	 :value            value
-	 :destination      dest
-	 :type             type
-	 :format-control   "~@<~S is not valid as a type specification.~@:>"
-	 :format-arguments `(,type)))
+  (->xml-conversion-error
+   value type dest
+   "~@<~S is not valid as a type specification.~@:>"
+   type))
 
 (defmethod ->xml :around ((value t) (dest t) (type list)
 			  &key &allow-other-keys)
@@ -265,14 +259,11 @@ found."
 		  &key &allow-other-keys)
   "Catch-all for STP nodes that do not have an obvious string
 interpretation."
-  (error '->xml-conversion-error
-	 :value            value
-	 :destination      dest
-	 :type             type
-	 :format-control   "~@<Cannot store a string into an ~A node; ~
-Append /text() to the XPath if you intended to write an element's ~
-text.~@:>"
-	 :format-arguments `(,(type-of dest))))
+  (->xml-conversion-error
+   value type dest
+   "~@<Cannot store a string into an ~A node; Append /text() to the ~
+XPath if you intended to write an element's text.~@:>"
+   (type-of dest)))
 
 (defmethod ->xml ((value t) (dest (eql nil)) (type (eql 'string))
 		  &key &allow-other-keys)
