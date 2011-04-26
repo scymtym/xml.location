@@ -75,3 +75,16 @@
 		(ensure-same
 		 result matrix
 		 :test #'lisplab:.=)))))
+
+(addtest (lisplab-root
+          :documentation
+	  "Test conditions signaled by ->xml conversion for lisplab
+matrices.")
+  xml->-conditions
+
+  (ensure-cases (doc xpath type) ('("<foo rows='1' cols='3' element-type='double-float'>1 2</foo>"
+				    "node()"
+				    lisplab:matrix-base))
+    (ensure-condition 'xml->-conversion-error
+      (let ((loc (loc doc xpath)))
+	(val loc :type type)))))
