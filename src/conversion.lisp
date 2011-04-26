@@ -234,7 +234,7 @@ found."
 (defmethod ->xml ((value t) (dest stp:text) (type t)
 		  &key &allow-other-keys)
   "Convert VALUE to string and store in DEST."
-  (setf (stp:data dest) (->xml value nil 'string))
+  (setf (stp:data dest) (->xml value 'string type))
   value)
 
 (defmethod ->xml ((value string) (dest stp:text) (type t)
@@ -245,7 +245,7 @@ found."
 (defmethod ->xml ((value t) (dest stp:attribute) (type t)
 		  &key &allow-other-keys)
   "Convert VALUE to string and store in DEST."
-  (setf (stp:value dest) (->xml value nil 'string))
+  (setf (stp:value dest) (->xml value 'string type))
   value)
 
 (defmethod ->xml ((value string) (dest stp:attribute) (type t)
@@ -263,18 +263,18 @@ interpretation."
 XPath if you intended to write an element's text.~@:>"
    (type-of dest)))
 
-(defmethod ->xml ((value t) (dest (eql nil)) (type (eql 'string))
+(defmethod ->xml ((value t) (dest (eql 'string)) (type t)
 		  &key &allow-other-keys)
   "Convert VALUE to requested type string by `prin1'ing it."
   (with-standard-io-syntax
     (prin1-to-string value)))
 
-(defmethod ->xml ((value string) (dest (eql nil)) (type (eql 'string))
+(defmethod ->xml ((value string) (dest (eql 'string)) (type t)
 		  &key &allow-other-keys)
   "Fast-path method for string VALUE."
   value)
 
-(defmethod ->xml ((value sequence) (dest (eql nil)) (type (eql 'string))
+(defmethod ->xml ((value sequence) (dest (eql 'string)) (type t)
 		  &key &allow-other-keys)
   "Convert sequence VALUE to string by `format'ting."
   (with-standard-io-syntax

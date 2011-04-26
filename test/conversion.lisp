@@ -108,7 +108,7 @@ with type ~S produced ~S, not ~S.~@:>"
   smoke
 
   (iter (for (value type expected) in cases)
-	(check-->xml-conversion value type nil expected)
+	(check-->xml-conversion value 'string type expected)
 	(check-->xml-conversion-node
 	 value type (stp:make-text "") expected)
 	(check-->xml-conversion-node
