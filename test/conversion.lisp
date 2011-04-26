@@ -36,7 +36,7 @@
        (ensure-same
 	result expected
 	:test      #'equal
-	:report    "~@<xml-> conversion of the value ~S to type ~S ~
+	:report    "~@<`xml->' conversion of the value ~S to type ~S ~
 produced ~S, not ~S.~@:>"
 	:arguments (value type result expected)))))
   (:documentation
@@ -81,7 +81,7 @@ produced ~S, not ~S.~@:>"
        (ensure-same
 	result expected
 	:test      #'equal
-	:report    "~@<xml-> conversion of the value ~S to destination ~S ~
+	:report    "~@<`xml->' conversion of the value ~S to destination ~S ~
 with type ~S produced ~S, not ~S.~@:>"
 	:arguments (value dest type result expected)))))
   (:function
@@ -90,13 +90,13 @@ with type ~S produced ~S, not ~S.~@:>"
        (ensure-same
 	result value
 	:test      #'equal
-	:report    "~@<xml-> conversion of the value ~S to destination ~S ~
+	:report    "~@<`xml->' conversion of the value ~S to destination ~S ~
 with type ~S returned ~S, not ~S.~@:>"
 	:arguments (value dest type result value))
        (ensure-same
 	(stp:string-value dest) expected
 	:test      #'equal
-	:report    "~@<xml-> conversion of the value ~S to destination ~S ~
+	:report    "~@<`xml->' conversion of the value ~S to destination ~S ~
 with type ~S produced ~S, not ~S.~@:>"
 	:arguments (value dest type result expected)))))
   (:documentation
