@@ -326,7 +326,7 @@ CONDITION."
 `simple-condition' CONDITION on STREAM. Otherwise just add a colon."
   (let ((control   (simple-condition-format-control   condition))
 	(arguments (simple-condition-format-arguments condition)))
-    (if (and (not (emptyp control)) arguments)
+    (if (and control (not (emptyp control)))
 	(progn
 	  (format stream ": ~%")
 	  (apply #'format stream control arguments))
