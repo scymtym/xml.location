@@ -57,8 +57,8 @@ type ~S of the supplied destination matrix.~@:>"
 		       elements)
 	(xml->-conversion-error
 	 value type
-	 "~@<The number of stored elements, ~D, ~ does not match the ~
-number of elements, ~D, of the supplied destination ~ matrix.~@:>"
+	 "~@<The number of stored elements, ~D, does not match the ~
+number of elements, ~D, of the supplied destination matrix.~@:>"
 	 (length elements) (* rows cols)))
 
       (lisplab:import-list type elements))
