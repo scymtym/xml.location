@@ -30,7 +30,7 @@
 error if dimensions or element type are incompatible."
   (with-locations-r/o (((:@   rows         :type 'number)        ".")
 		       ((:@   cols         :type 'number)        ".")
-		       ((:@   element-type :type 'symbol)        ".") ;; TODO what about (complex double-float)?
+		       ((:@   element-type :type 'type)          ".")
 		       ((:val text         :type '(list number)) "text()[last()]"))
       value
 
@@ -79,7 +79,7 @@ and reading elements from a text child node."
 
   (with-locations-r/o (((:@ rows         :type 'number) ".")
 		       ((:@ cols         :type 'number) ".")
-		       ((:@ element-type :type 'symbol) ".")) ;; TODO what about (complex double-float)?
+		       ((:@ element-type :type 'type)   "."))
       value
 
     (let* ((class  (or matrix-class
@@ -132,7 +132,7 @@ attributes and using a text child node for the elements."
 			   (lisplab:element-type value))))
     (with-locations (((:@   rows         :type 'number) ".")
 		     ((:@   cols         :type 'number) ".")
-		     ((:@   element-type :type 'symbol) ".")
+		     ((:@   element-type :type 'type)   ".")
 		     ((:val text         :type `(list ,element-type1))
 		                                        "text()"))
 	dest

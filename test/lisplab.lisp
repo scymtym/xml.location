@@ -45,7 +45,7 @@
 (addtest (lisplab-root
           :documentation
 	  "Test ->xml conversion for lisplab matrices.")
-  xml->
+  xml->-new-instance
 
   (iter (for (doc path) in locations)
 	(iter (for matrix in matrices)
@@ -53,6 +53,25 @@
 		     (result (progn
 			       (setf (val loc) matrix)
 			       (val loc :type 'lisplab:matrix-base))))
+		(ensure-same
+		 (lisplab:element-type result)
+		 (lisplab:element-type matrix)
+		 :test #'type=)
+		(ensure-same
+		 result matrix
+		 :test #'lisplab:.=)))))
+
+(addtest (lisplab-root
+          :documentation
+	  "Test ->xml conversion for lisplab matrices.")
+  xml->-into-instance
+
+  (iter (for (doc path) in locations)
+	(iter (for matrix in matrices)
+	      (let ((loc    (loc doc path))
+		    (result (lisplab:copy matrix)))
+		(setf (val loc) matrix)
+		(val loc :type result)
 		(ensure-same
 		 result matrix
 		 :test #'lisplab:.=)))))
