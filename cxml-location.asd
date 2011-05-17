@@ -97,7 +97,10 @@
 		:lift
 
 		:local-time
-		:lisplab)
+		#.(if (find-system :lisplab nil)
+		      :lisplab
+		      (values))
+		)
   :components  ((:module     "test"
 		 :components ((:file       "package")
 			      (:file       "location"
@@ -111,14 +114,19 @@
 			       :depends-on ("package"))
 			      (:file       "ignore-empty-results-mixin"
 			       :depends-on ("package"))
-			      (:file       "append-nodes-mixin"
-			       :depends-on ("package"))
+			      #.(if (find-system :lisplab nil)
+				    '(:file       "append-nodes-mixin"
+			              :depends-on ("package"))
+				    (values))
 
 			      (:file       "local-time"
 			       :depends-on ("package"))
 
-			      (:file       "lisplab"
-			       :depends-on ("package")))))
+			      #.(if (find-system :lisplab nil)
+				    '(:file       "lisplab"
+				      :depends-on ("package"))
+				    (values))
+			      )))
   :in-order-to ((test-op (load-op :cxml-location-test))))
 
 (defmethod perform ((this test-op) (component (eql (find-system :cxml-location-test))))
