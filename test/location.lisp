@@ -40,8 +40,22 @@
     (ensure-same (name loc) "bli")
 
     (setf (name loc) "blup")
-
     (ensure-same (name loc) "blup")))
+
+(addtest (location-root
+          :documentation
+	  "Test attribute accessor of the `singleton-location'
+class.")
+  attribute
+
+  (let ((loc (loc simple-document "/bla/bli")))
+    (ensure-same (@ loc "b") "5")
+
+    (setf (@ loc "b") "6")
+    (ensure-same (@ loc "b") "6")
+
+    (ensure-condition 'error ;;; TODO(jmoringe): proper condition
+      (@ loc "attribute-does-not-exist"))))
 
 (addtest (location-root
           :documentation
