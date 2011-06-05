@@ -20,7 +20,7 @@
 (in-package :cxml-location.test)
 
 (deftestsuite location-root (root)
-  ()
+  ((simple-document "<bla a='1'><bli b='5'>umumum</bli><bli/></bla>"))
   (:documentation
    "Root test suite for test of location class."))
 
@@ -33,20 +33,15 @@
 
 (addtest (location-root
           :documentation
-	  "Test name accessor of location.")
+	  "Test name accessor of the `singleton-location' class.")
   name
 
-  (let ((loc (loc "<bla a='1'><bli b='5'>umumum</bli><bli/></bla>"
-		  "/bla/bli")))
-    (ensure-same (name loc) "bli"))
-
-  (let ((loc (loc "<bla a='1'><bli b='5'>umumum</bli><bli/></bla>"
-		  "/bla/bli"
-		  :if-multiple-matches :all)))
-    (ensure-same (name loc) '("bli" "bli"))
+  (let ((loc (loc simple-document "/bla/bli")))
+    (ensure-same (name loc) "bli")
 
     (setf (name loc) "blup")
-    (ensure-same (name loc) '("blup" "blup"))))
+
+    (ensure-same (name loc) "blup")))
 
 (addtest (location-root
           :documentation

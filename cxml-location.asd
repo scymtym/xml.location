@@ -103,8 +103,12 @@
 		)
   :components  ((:module     "test"
 		 :components ((:file       "package")
+
 			      (:file       "location"
 			       :depends-on ("package"))
+			      (:file       "multi-location"
+			       :depends-on ("package"))
+
 			      (:file       "conversion"
 			       :depends-on ("package"))
 			      (:file       "macros"
