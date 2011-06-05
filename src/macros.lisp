@@ -29,11 +29,12 @@ BINDINGS-AND-OPTIONS specifies let-like (generalized) variable
 bindings according to the following syntax:
 BINDINGS  ::= (BINDING* OPTION*)
 BINDING   ::= (VAR-SPEC XPATH [ARG*])
-VAR-SPEC  ::= NAME-SPEC | VAL-SPEC | @-SPEC
+VAR-SPEC  ::= NAME-SPEC | VAL-SPEC | @-SPEC | LOC-SPEC
 NAME-SPEC ::= (:name SYMBOL [:prefix? BOOL])
 VAL-SPEC  ::= SYMBOL | (:val SYMBOL [:type TYPE])
-@-SPEC    ::= (:@ @-name [:type TYPE])
+@-SPEC    ::= (:@ @-NAME [:type TYPE])
 @-NAME    ::= SYMBOL | (SYMBOL \"STRING\")
+LOC-SPEC  ::= (:loc SYMBOL)
 OPTION    ::= KEY VALUE
 
 In all cases, SYMBOL is the name of the generalized variable that is
@@ -43,7 +44,21 @@ variable name, otherwise the name of attribute is computed as (string
 SYMBOL).
 
 Instead of the keywords :name, :val and :@ symbols of the same name in
-the cxml-location package can be used."
+the cxml-location package can be used.
+
+Example:
+XLOC> (xloc:with-locations-r/o
+          (((:@ (description-brief \"brief\")) \"package/description\")
+           (description-long                \"package/description/text()\")
+           (author                           \"package/author/text()\")
+           (dependencies                     \"package/depend/@package\"
+				       :if-multiple-matches :all)
+           (build-dependencies               \"package/rosbuild2/depend/@package\"
+				       :if-multiple-matches :all)
+           ((:val messages :type 'list)      \"package/rosbuild2/msgs/text()\")
+           ((:val services :type 'list)      \"package/rosbuild2/srvs/text()\")) doc
+        (values author messages))
+=> \"Joe User\" '(\"msg/bla.msg\")"
   (once-only (document)
     (bind (((:values bindings options)
 	    (%parse-bindings-and-options bindings-and-options))
