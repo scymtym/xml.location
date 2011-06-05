@@ -44,13 +44,27 @@
   name
 
   (let ((loc (loc simple-document "/bla/bli"
-		  :if-multiple-matches :all)))
+		  :if-multiple-matches :all
+		  :namespaces '(&default ("foo" . "http://foo.org/bar")))))
     (ensure-same (name loc) '("bli" "bli")
 		 :test #'equal)
 
     (setf (name loc) "blup")
-
     (ensure-same (name loc) '("blup" "blup")
+		 :test #'equal)
+
+    ;; A name with a colon should be treated as a qualified name.
+    (setf (name loc) "foo:blup")
+    (ensure-same (name loc) '("blup" "blup")
+		 :test #'equal)
+    (ensure-same (name loc :prefix? t) '("foo:blup" "foo:blup")
+		 :test #'equal)
+
+    ;; A list of three strings should be treated as a qualified name.
+    (setf (name loc) '("local" "prefix" "http://url.org/"))
+    (ensure-same (name loc) '("local" "local")
+		 :test #'equal)
+    (ensure-same (name loc :prefix? t) '("prefix:local" "prefix:local")
 		 :test #'equal)))
 
 (addtest (multi-location-root

@@ -39,11 +39,28 @@
 	  "Test name accessor of the `singleton-location' class.")
   name
 
-  (let ((loc (loc simple-document "/bla/bli")))
-    (ensure-same (name loc) "bli")
+  (let ((loc (loc simple-document "/bla/bli"
+		  :namespaces '(&default ("foo" . "http://foo.org/bar")))))
+    (ensure-same (name loc) "bli"
+		 :test #'string=)
 
     (setf (name loc) "blup")
-    (ensure-same (name loc) "blup")))
+    (ensure-same (name loc) "blup"
+		 :test #'string=)
+
+    ;; A name with a colon should be treated as a qualified name.
+    (setf (name loc) "foo:blup")
+    (ensure-same (name loc) "blup"
+		 :test #'string=)
+    (ensure-same (name loc :prefix? t) "foo:blup"
+		 :test #'string=)
+
+    ;; A list of three strings should be treated as a qualified name.
+    (setf (name loc) '("local" "prefix" "http://url.org/"))
+    (ensure-same (name loc) "local"
+		 :test #'string=)
+    (ensure-same (name loc :prefix? t) "prefix:local"
+		 :test #'string=)))
 
 (addtest (location-root
           :documentation
