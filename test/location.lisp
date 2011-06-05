@@ -1,4 +1,4 @@
-;;; location.lisp ---
+;;; location.lisp --- Unit tests for the singleton-location class.
 ;;
 ;; Copyright (C) 2011 Jan Moringen
 ;;
@@ -29,7 +29,10 @@
 	  "Smoke test for location class.")
   smoke
 
-  (ensure (loc "<simple attr='8'>text</simple>" "simple/text()")))
+  (ensure (loc simple-document "bla/bli/text()"))
+
+  (ensure-condition 'empty-result-set
+    (loc simple-document "no-such-node")))
 
 (addtest (location-root
           :documentation
