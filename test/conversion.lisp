@@ -25,12 +25,7 @@
    "Root test suite for conversion tests."))
 
 (deftestsuite xml->-root (conversion-root)
-  ((cases '(("string"                 string        "string")
-	    ("5"                      real          5)
-	    ("5"                      (real)        5)
-	    (":a :b"                  list          (":a" ":b"))
-	    (":a :b"                  (list symbol) (:a :b))
-	    ("(COMPLEX DOUBLE-FLOAT)" type          (complex double-float)))))
+  ()
   (:function
    (check-xml->-conversion (value type expected)
      (let ((result (xml-> value type)))
@@ -48,11 +43,17 @@ produced ~S, not ~S.~@:>"
 	  "Smoke test for from-XML conversion.")
   smoke
 
-  (iter (for (value type expected) in cases)
-	(check-xml->-conversion value                 type expected)
-	(check-xml->-conversion (stp:make-text value) type expected)
-	(check-xml->-conversion
-	 (stp:make-attribute value "foo") type expected)))
+  (ensure-cases (value type expected)
+      '(("string"                 string        "string")
+	("5"                      real          5)
+	("5"                      (real)        5)
+	(":a :b"                  list          (":a" ":b"))
+	(":a :b"                  (list symbol) (:a :b))
+	("(COMPLEX DOUBLE-FLOAT)" type          (complex double-float)))
+    (check-xml->-conversion value                 type expected)
+    (check-xml->-conversion (stp:make-text value) type expected)
+    (check-xml->-conversion
+     (stp:make-attribute value "foo") type expected)))
 
 (addtest (xml->-root
           :documentation
@@ -72,11 +73,7 @@ produced ~S, not ~S.~@:>"
     (xml-> (stp:make-element "value") 'string)))
 
 (deftestsuite ->xml-root (conversion-root)
-  ((cases '(("string"               string "string")
-	    (5                      string "5")
-	    ((":a" ":b")            string "\":a\" \":b\"")
-	    ((:a :b)                string ":A :B")
-	    ((complex double-float) type   "(COMPLEX DOUBLE-FLOAT)"))))
+  ()
   (:function
    (check-->xml-conversion (value dest type expected)
      (let ((result (->xml value dest type)))
@@ -109,12 +106,17 @@ with type ~S produced ~S, not ~S.~@:>"
 	  "Smoke test for to-XML conversion.")
   smoke
 
-  (iter (for (value type expected) in cases)
-	(check-->xml-conversion value 'string type expected)
-	(check-->xml-conversion-node
-	 value (stp:make-text "") type expected)
-	(check-->xml-conversion-node
-	 value (stp:make-attribute "" "foo") type expected)))
+  (ensure-cases (value type expected)
+      '(("string"               string "string")
+	(5                      string "5")
+	((":a" ":b")            string "\":a\" \":b\"")
+	((:a :b)                string ":A :B")
+	((complex double-float) type   "(COMPLEX DOUBLE-FLOAT)"))
+    (check-->xml-conversion value 'string type expected)
+    (check-->xml-conversion-node
+     value (stp:make-text "") type expected)
+    (check-->xml-conversion-node
+     value (stp:make-attribute "" "foo") type expected)))
 
 (addtest (->xml-root
           :documentation
