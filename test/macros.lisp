@@ -46,14 +46,10 @@ foo:bar='foo.bar:bar' baz:bar='baz.doo:bar'/>"
 		   ((@ bar)                               "node()"))
       simple-document
     ;; Extract values from generalized variables
-    (ensure-same name "bla"
-		 :test #'string=)
-    (ensure-same foo '(1 2 4)
-		 :test #'equal)
-    (ensure-same bar "baz"
-		 :test #'string=)
-    (ensure-same text "foo"
-		 :test #'string=)
+    (ensure-same name "bla"    :test #'string=)
+    (ensure-same foo  '(1 2 4) :test #'equalp)
+    (ensure-same bar  "baz"    :test #'string=)
+    (ensure-same text "foo"    :test #'string=)
 
     ;; Set values of generalized variables
     (setf name "frooble"
@@ -74,13 +70,12 @@ foo:bar='foo.bar:bar' baz:bar='baz.doo:bar'/>"
   loc
 
   (with-locations (((:loc self) "bla")
-		   ((:loc text) "bla/text()")) multi-document
-    (ensure-same
-     (name self) "bla"
-     :test #'string=)
-    (ensure-same
-     (val text) "foo"
-     :test #'string=)))
+		   ((:loc text) "bla/text()")
+		   ((:loc self-no-path))) multi-document
+    (ensure-same (name self) "bla" :test #'string=)
+    (ensure-same (val text)  "foo" :test #'string=)
+    (ensure-same (location-result self-no-path) multi-document
+		 :test #'eq)))
 
 (addtest (macros-root
           :documentation

@@ -98,7 +98,7 @@ necessary. Return two values:
 + A list of place forms"
   (let ((reusable-locations (make-hash-table :test #'equal)))
     (iter (for spec in bindings)
-	  (bind (((access-spec path &rest args) spec)
+	  (bind (((access-spec &optional (path ".") &rest args) spec)
 		 ((:flet make-location-form ())
 		  (multiple-value-list
 		   (%make-location-form document path
