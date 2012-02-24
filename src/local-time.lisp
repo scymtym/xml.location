@@ -1,6 +1,6 @@
 ;;; local-time.lisp --- XML conversions for local-time timestamps.
 ;;
-;; Copyright (C) 2011 Jan Moringen
+;; Copyright (C) 2011, 2012 Jan Moringen
 ;;
 ;; Author: Jan Moringen <jmoringe@techfak.uni-bielefeld.de>
 ;;
@@ -35,13 +35,10 @@
 specified as inner types.~@:>"
      type inner-types))
 
-  (unless (eq (aref value 0) #\@)
-    (xml->-conversion-error
-     value type
-     "~@<Serialized timestamp value ~S does not start with '@'.~@:>"
-     value))
-
-  (local-time:parse-timestring (subseq value 1) :fail-on-error t))
+  (local-time:parse-timestring
+   value
+   :start         (if (starts-with #\@ value) 1 0)
+   :fail-on-error t))
 
 ;; we get the primary ->xml method for free via prin1ing in this case
 
