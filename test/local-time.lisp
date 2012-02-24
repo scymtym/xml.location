@@ -1,6 +1,6 @@
 ;;; local-time.lisp --- Unit tests for local-time XML conversion.
 ;;
-;; Copyright (C) 2011 Jan Moringen
+;; Copyright (C) 2011, 2012 Jan Moringen
 ;;
 ;; Author: Jan Moringen <jmoringe@techfak.uni-bielefeld.de>
 ;;
@@ -69,5 +69,5 @@ conversions.")
       (val loc :type 'local-time:timestamp)))
 
   (let ((loc (loc "<foo ts='@invalid timestamp'/>" "node()/@ts")))
-    (ensure-condition 'local-time::invalid-timestring
+    (ensure-condition 'xml->-conversion-error
       (val loc :type 'local-time:timestamp))))

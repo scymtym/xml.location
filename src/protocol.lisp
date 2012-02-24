@@ -1,6 +1,6 @@
 ;;; protocol.lisp ---
 ;;
-;; Copyright (C) 2011 Jan Moringen
+;; Copyright (C) 2011, 2012 Jan Moringen
 ;;
 ;; Author: Jan Moringen <jmoringe@techfak.uni-bielefeld.de>
 ;;
@@ -184,3 +184,29 @@ INNER-TYPES. The result of the conversion is returned."))
   (:documentation
    "Convert VALUE to a suitable type and store the result of the
 conversion in the XML node DEST. Should return VALUE."))
+
+
+;;; Default behavior
+;;
+
+(defmethod xml-> :around ((value t) (type t)
+			  &key
+			  inner-types)
+  (declare (ignore inner-types))
+
+  (handler-bind
+      (((and error (not xml->-conversion-error))
+	#'(lambda (condition)
+	    (xml->-conversion-error value type "~A" condition))))
+    (call-next-method)))
+
+(defmethod ->xml :around ((value t) (dest t) (type t)
+			  &key
+			  inner-types)
+  (declare (ignore inner-types))
+
+  (handler-bind
+      (((and error (not ->xml-conversion-error))
+	#'(lambda (condition)
+	    (->xml-conversion-error value type dest "~A" condition))))
+    (call-next-method)))
