@@ -1,6 +1,6 @@
 ;;; conversion.lisp --- To and from XML conversions for some data types.
 ;;
-;; Copyright (C) 2011 Jan Moringen
+;; Copyright (C) 2011, 2012 Jan Moringen
 ;;
 ;; Author: Jan Moringen <jmoringe@techfak.uni-bielefeld.de>
 ;;
@@ -60,15 +60,20 @@
 ;; case, `make-instance' is called with TYPE and `xml->' is called
 ;; with the resulting instance as TYPE.
 
-(defmethod no-applicable-method ((function (eql (fdefinition 'xml->)))
-				 &rest args)
-  "Signal a conversion error if no applicable conversion method is
+(macrolet
+    ((define-error-method (name)
+       `(defmethod ,name ((function (eql (fdefinition 'xml->)))
+			  &rest args)
+	 "Signal a conversion error if no applicable conversion method is
 found."
-  (bind (((value type &rest key-args) args))
-    (declare (ignore key-args))
-    (error 'no-xml->-conversion-method
-	   :value value
-	   :type  type)))
+	 (bind (((value type &rest key-args) args))
+	   (declare (ignore key-args))
+	   (error 'no-xml->-conversion-method
+		  :value value
+		  :type  type)))))
+
+  (define-error-method no-applicable-method)
+  #+sbcl (define-error-method sb-pcl::no-primary-method))
 
 (defmethod xml-> ((value t) (type list)
 		  &key &allow-other-keys)
@@ -206,16 +211,21 @@ name.~@:>"
 ;;    is implemented. Otherwise, dispatching on VALUE is sufficient to
 ;;    select the appropriate method.
 
-(defmethod no-applicable-method ((function (eql (fdefinition '->xml)))
-				 &rest args)
-  "Signal a conversion error if no applicable conversion method is
+(macrolet
+    ((define-error-method (name)
+       `(defmethod ,name ((function (eql (fdefinition '->xml)))
+			  &rest args)
+	  "Signal a conversion error if no applicable conversion method is
 found."
-  (bind (((value dest type &rest key-args) args))
-    (declare (ignore key-args))
-    (error 'no-->xml-conversion-method
-	   :value       value
-	   :destination dest
-	   :type        type)))
+	  (bind (((value dest type &rest key-args) args))
+	    (declare (ignore key-args))
+	    (error 'no-->xml-conversion-method
+		   :value       value
+		   :destination dest
+		   :type        type)))))
+
+  (define-error-method no-applicable-method)
+  #+sbcl (define-error-method sb-pcl::no-primary-method))
 
 (defmethod ->xml ((value t) (dest t) (type list)
 		  &key &allow-other-keys)
