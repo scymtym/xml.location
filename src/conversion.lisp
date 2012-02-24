@@ -94,6 +94,11 @@ found."
     (t
      (xml-> value (first type) :inner-types (rest type)))))
 
+(defmethod xml-> ((value stp:document) (type t)
+		  &rest args
+		  &key &allow-other-keys)
+  (apply #'xml-> (stp:document-element value) type args))
+
 ;; Case 1 methods
 
 (defmethod xml-> ((value stp:text) (type t)
@@ -245,6 +250,12 @@ found."
      (->xml value dest (first type)))
     (t
      (->xml value dest (first type) :inner-types (rest type)))))
+
+(defmethod ->xml ((value t) (dest stp:document) (type t)
+		  &rest args
+		  &key &allow-other-keys)
+  "Convert VALUE to string and store in DEST."
+  (apply #'->xml value (stp:document-element dest) type args))
 
 ;; Case 1 methods
 
