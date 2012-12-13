@@ -1,6 +1,6 @@
 ;;; singleton-location.lisp --- A location that corresponds to a single node.
 ;;
-;; Copyright (C) 2011 Jan Moringen
+;; Copyright (C) 2011, 2012 Jan Moringen
 ;;
 ;; Author: Jan Moringen <jmoringe@techfak.uni-bielefeld.de>
 ;;
@@ -38,7 +38,7 @@ evaluates to a node set that consists of more than one nodes."))
 XPath that produces exactly one match in the document."))
 
 (defmethod evaluate! :around ((location singleton-location))
-  (bind (((:slots document path result if-no-match if-multiple-matches) location)
+  (let+ (((&slots document path result if-no-match if-multiple-matches) location)
 	 (result-set (call-next-method)))
 
     (cond
@@ -89,7 +89,7 @@ XPath that produces exactly one match in the document."))
 
 (defmethod (setf name) ((new-value list)
 			(location  singleton-location))
-  (bind (((local-name prefix uri) new-value)
+  (let+ (((local-name prefix uri) new-value)
 	 (item (location-result location)))
     (setf (stp:namespace-uri    item) uri
 	  (stp:namespace-prefix item) prefix

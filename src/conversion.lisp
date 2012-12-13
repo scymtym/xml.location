@@ -66,7 +66,7 @@
 			  &rest args)
 	 "Signal a conversion error if no applicable conversion method is
 found."
-	 (bind (((value type &rest key-args) args))
+	 (let+ (((value type &rest key-args) args))
 	   (declare (ignore key-args))
 	   (error 'no-xml->-conversion-method
 		  :value value
@@ -222,7 +222,7 @@ name.~@:>"
 			  &rest args)
 	  "Signal a conversion error if no applicable conversion method is
 found."
-	  (bind (((value dest type &rest key-args) args))
+	  (let+ (((value dest type &rest key-args) args))
 	    (declare (ignore key-args))
 	    (error 'no-->xml-conversion-method
 		   :value       value

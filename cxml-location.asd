@@ -1,6 +1,6 @@
 ;;; cxml-location.asd --- System definition of the cxml-location system.
 ;;
-;; Copyright (C) 2011 Jan Moringen
+;; Copyright (C) 2011, 2012 Jan Moringen
 ;;
 ;; Author: Jan Moringen <jmoringe@techfak.uni-bielefeld.de>
 ;;
@@ -36,9 +36,10 @@
   :license     "GPL3; see COPYING file for details."
   :description "This system provides a convenient interface for
  manipulating XML data. It is inspired by the xmltio library."
-  :depends-on  (:iterate
-		:metabang-bind
+  :depends-on  (:alexandria
 		:split-sequence
+		:iterate
+		:let-plus
 		:closer-mop
 		:cxml-stp
 		:xpath

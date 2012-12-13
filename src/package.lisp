@@ -1,6 +1,6 @@
 ;;; package.lisp --- Package Definition for cxml-location Module.
 ;;
-;; Copyright (C) 2011 Jan Moringen
+;; Copyright (C) 2011, 2012 Jan Moringen
 ;;
 ;; Author: Jan Moringen <jmoringe@techfak.uni-bielefeld.de>
 ;;
@@ -26,9 +26,10 @@
   (:use
    :cl
    :alexandria
-   :iter
-   :bind
    :split-sequence
+   :iterate
+   :let-plus
+
    :dynamic-classes)
 
   ;; Special Symbols and variables

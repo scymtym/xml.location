@@ -1,6 +1,6 @@
 ;;; construction.lisp --- Construction of location instances.
 ;;
-;; Copyright (C) 2011 Jan Moringen
+;; Copyright (C) 2011, 2012 Jan Moringen
 ;;
 ;; Author: Jan Moringen <jmoringe@techfak.uni-bielefeld.de>
 ;;
@@ -33,7 +33,7 @@ IF-NO-MATCH."
   (declare (ignore if-multiple-matches if-no-match assign-mode))
 
   ;; Create the location instance
-  (bind (((:values class args) (apply #'%compute-location-class args)))
+  (let+ (((&values class args) (apply #'%compute-location-class args)))
     (apply #'make-instance class
 	   :document document
 	   :path     path

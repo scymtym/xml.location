@@ -1,6 +1,6 @@
 ;;; macros.lisp --- Convenience macros for the cxml-location system.
 ;;
-;; Copyright (C) 2011 Jan Moringen
+;; Copyright (C) 2011, 2012 Jan Moringen
 ;;
 ;; Author: Jan Moringen <jmoringe@techfak.uni-bielefeld.de>
 ;;
@@ -60,9 +60,9 @@ XLOC> (xloc:with-locations-r/o
         (values author messages))
 => \"Joe User\" '(\"msg/bla.msg\")"
   (once-only (document)
-    (bind (((:values bindings options)
+    (let+ (((&values bindings options)
 	    (%parse-bindings-and-options bindings-and-options))
-	   ((:values locations places)
+	   ((&values locations places)
 	    (%make-location-and-place-forms document bindings
 					    :global-args options
 					    :writable?   t)))
@@ -74,9 +74,9 @@ XLOC> (xloc:with-locations-r/o
 			      &body body)
   "Like `with-locations', but binding places are not `setf'-able."
   (once-only (document)
-    (bind (((:values bindings options)
+    (let+ (((&values bindings options)
 	    (%parse-bindings-and-options bindings-and-options))
-	   ((:values locations places)
+	   ((&values locations places)
 	    (%make-location-and-place-forms document bindings
 					    :global-args options)))
       `(let* (,@locations
@@ -98,14 +98,14 @@ necessary. Return two values:
 + A list of place forms"
   (let ((reusable-locations (make-hash-table :test #'equal)))
     (iter (for spec in bindings)
-	  (bind (((access-spec &optional (path ".") &rest args) spec)
-		 ((:flet make-location-form ())
-		  (multiple-value-list
-		   (%make-location-form document path
-					(append (when writable?
-						  `(:if-no-match :create))
-						global-args
-						args))))
+	  (let+ (((access-spec &optional (path ".") &rest args) spec)
+		 ((&flet make-location-form ()
+		    (multiple-value-list
+		     (%make-location-form document path
+					  (append (when writable?
+						    `(:if-no-match :create))
+						  global-args
+						  args)))))
 		 (key (cons path args))
 		 ((location-var &optional location-form)
 		  (cond
@@ -121,7 +121,7 @@ necessary. Return two values:
 		    (t
 		     (setf (gethash key reusable-locations)
 			   (make-location-form)))))
-		 ((:values name access-form)
+		 ((&values name access-form)
 		  (%parse-access-spec access-spec
 				      :location-var location-var)))
 
@@ -184,19 +184,16 @@ and ARGS. Return two values:
 			       &key
 			       location-var
 			       inner-specs)
-  (bind (((name) inner-specs))
-    (values
-     name
-     `(loc ,location-var "."))))
+  (let+ (((name) inner-specs))
+    (values name `(loc ,location-var "."))))
 
 (defmethod %parse-access-spec ((spec (eql :name))
 			       &key
 			       location-var
 			       inner-specs)
-  (bind (((name &key prefix?) inner-specs))
-    (values
-     name
-     `(name ,location-var ,@(when prefix? '((:prefix t)))))))
+  (let+ (((name &key prefix?) inner-specs))
+    (values name
+	    `(name ,location-var ,@(when prefix? '((:prefix t)))))))
 
 (defmethod %parse-access-spec ((spec (eql 'name))
 			       &rest args)
@@ -206,12 +203,10 @@ and ARGS. Return two values:
 			       &key
 			       location-var
 			       inner-specs)
-  (bind (((name &key type) inner-specs))
-    (values
-     name
-     `(val ,location-var
-	   ,@(when type
-		   `(:type ,type))))))
+  (let+ (((name &key type) inner-specs))
+    (values name `(val ,location-var
+		       ,@(when type
+			   `(:type ,type))))))
 
 (defmethod %parse-access-spec ((spec (eql 'val))
 			       &rest args)
@@ -221,17 +216,15 @@ and ARGS. Return two values:
 			       &key
 			       location-var
 			       inner-specs)
-  (bind (((name-spec &key type) inner-specs)
+  (let+ (((name-spec &key type) inner-specs)
 	 ((name attribute-name)
 	  (if (listp name-spec)
 	      name-spec
 	      (list name-spec
 		    (string-downcase (string name-spec))))))
-    (values
-     name
-     `(@ ,location-var ,attribute-name
-		       ,@(when type
-			       `(:type ,type))))))
+    (values name `(@ ,location-var ,attribute-name
+				   ,@(when type
+				       `(:type ,type))))))
 
 (defmethod %parse-access-spec ((spec (eql '@))
 			       &rest args)

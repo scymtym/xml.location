@@ -1,6 +1,6 @@
 ;;; multi-location.lisp ---
 ;;
-;; Copyright (C) 2011 Jan Moringen
+;; Copyright (C) 2011, 2012 Jan Moringen
 ;;
 ;; Author: Jan Moringen <jmoringe@techfak.uni-bielefeld.de>
 ;;
@@ -49,7 +49,7 @@ have a name")
 
 (defmethod (setf name) ((new-value list)
 			(location  multi-location))
-  (bind (((local-name prefix uri) new-value))
+  (let+ (((local-name prefix uri) new-value))
     (xpath:map-node-set->list
      #'(lambda (item)
 	 (setf (stp:namespace-uri    item) uri

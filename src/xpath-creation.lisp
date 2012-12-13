@@ -1,6 +1,6 @@
 ;;; xpath-creation.lisp --- XPath creation functions.
 ;;
-;; Copyright (C) 2011 Jan Moringen
+;; Copyright (C) 2011, 2012 Jan Moringen
 ;;
 ;; Author: Jan Moringen <jmoringe@techfak.uni-bielefeld.de>
 ;;
@@ -85,7 +85,7 @@ of PATH."
 				 &rest args)
   "Signal an error if no `create-xpath-element' method is
 applicable."
-  (bind (((location type name predicate) args))
+  (let+ (((location type name predicate) args))
     (error 'xpath-creation-error
 	   :location  location
 	   :type      type
@@ -138,7 +138,7 @@ applicable."
 				  (type      (eql :child))
 				  (name      list)
 				  (predicate (eql nil)))
-  (bind (((marker prefix local-name) name))
+  (let+ (((marker prefix local-name) name))
     (unless (eq marker :qname)
       (error 'xpath-creation-error
 	     :location         location

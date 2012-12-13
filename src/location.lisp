@@ -1,6 +1,6 @@
 ;;; location.lisp ---
 ;;
-;; Copyright (C) 2011 Jan Moringen
+;; Copyright (C) 2011, 2012 Jan Moringen
 ;;
 ;; Author: Jan Moringen <jmoringe@techfak.uni-bielefeld.de>
 ;;
@@ -104,7 +104,7 @@ out on the node or nodes of the node set."))
 				       &rest args
 				       &key &allow-other-keys)
   "Handle qualified attribute names."
-  (bind (((:values local-name _ uri)
+  (let+ (((&values local-name &ign uri)
 	  (maybe-decode-qname location name)))
     (if uri
 	(apply #'call-next-method location local-name :uri uri args)
@@ -136,9 +136,9 @@ multiple value. If NAME is not qualified, the secondary and tertiary
 values are both nil."
   (let ((index (position #\: name)))
     (if index
-	(bind (((:slots-r/o namespaces) location)
+	(let+ (((&slots-r/o namespaces) location)
 	       (env (xpath::make-dynamic-environment namespaces))
-	       ((:values local-name uri)
+	       ((&values local-name uri)
 		(xpath::decode-qname name env t)))
 	  (values local-name (subseq name 0 index) uri))
 	(values name nil nil))))
@@ -147,7 +147,7 @@ values are both nil."
 				(location  location))
   "Determine whether NEW-VALUE is qualified and call and appropriate
 next method."
-  (bind (((:values local-name prefix uri)
+  (let+ (((&values local-name prefix uri)
 	  (maybe-decode-qname location new-value)))
     (if uri
 	(setf (name location) (list local-name prefix uri))
