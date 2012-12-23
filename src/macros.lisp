@@ -1,4 +1,4 @@
-;;; macros.lisp --- Convenience macros for the cxml-location system.
+;;; macros.lisp --- Convenience macros for the xml.location system.
 ;;
 ;; Copyright (C) 2011, 2012 Jan Moringen
 ;;
@@ -17,7 +17,7 @@
 ;; You should have received a copy of the GNU General Public License
 ;; along with this program. If not, see <http://www.gnu.org/licenses>.
 
-(cl:in-package #:cxml-location)
+(cl:in-package #:xml.location)
 
 (defmacro with-locations ((&rest bindings-and-options) document
 			  &body body)
@@ -44,7 +44,7 @@ variable name, otherwise the name of attribute is computed as (string
 SYMBOL).
 
 Instead of the keywords :name, :val and :@ symbols of the same name in
-the cxml-location package can be used.
+the xml.location package can be used.
 
 Example:
 XLOC> (xloc:with-locations-r/o

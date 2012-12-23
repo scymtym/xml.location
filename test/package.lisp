@@ -1,4 +1,4 @@
-;;; package.lisp --- Package Definition for Unit Tests of the cxml-location System.
+;;; package.lisp --- Package Definition for Unit Tests of the xml.location System.
 ;;
 ;; Copyright (C) 2011, 2012 Jan Moringen
 ;;
@@ -17,24 +17,24 @@
 ;; You should have received a copy of the GNU General Public License
 ;; along with this program. If not, see <http://www.gnu.org/licenses>.
 
-(cl:defpackage #:cxml-location.test
+(cl:defpackage #:xml.location.test
   (:use
    #:cl
    #:alexandria
    #:iterate
    #:lift
 
-   #:cxml-location)
+   #:xml.location)
 
   (:export
    #:root)
 
   (:documentation
-   "This package contains unit tests for the cxml-location system."))
+   "This package contains unit tests for the xml.location system."))
 
-(cl:in-package #:cxml-location.test)
+(cl:in-package #:xml.location.test)
 
 (deftestsuite root ()
   ()
   (:documentation
-   "Root unit test suite for the cxml-location system."))
+   "Root unit test suite for the xml.location system."))

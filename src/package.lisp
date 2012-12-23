@@ -1,4 +1,4 @@
-;;; package.lisp --- Package Definition for cxml-location Module.
+;;; package.lisp --- Package Definition for xml.location Module.
 ;;
 ;; Copyright (C) 2011, 2012 Jan Moringen
 ;;
@@ -17,7 +17,7 @@
 ;; You should have received a copy of the GNU General Public License
 ;; along with this program. If not, see <http://www.gnu.org/licenses>.
 
-(cl:defpackage #:cxml-location
+(cl:defpackage #:xml.location
   (:nicknames
    #:xloc)
 

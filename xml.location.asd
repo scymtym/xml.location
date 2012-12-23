@@ -1,4 +1,4 @@
-;;; cxml-location.asd --- System definition of the cxml-location system.
+;;; xml.location.asd --- System definition of the xml.location system.
 ;;
 ;; Copyright (C) 2011, 2012 Jan Moringen
 ;;
@@ -17,18 +17,18 @@
 ;; You should have received a copy of the GNU General Public License
 ;; along with this program. If not, see <http://www.gnu.org/licenses>.
 
-(cl:defpackage #:cxml-location-system
+(cl:defpackage #:xml.location-system
   (:use
    #:cl
    #:asdf))
 
-(cl:in-package #:cxml-location-system)
+(cl:in-package #:xml.location-system)
 
-(defsystem :cxml-location
+(defsystem :xml.location
   :author      "Jan Moringen <jmoringe@techfak.uni-bielefeld.de>"
   :maintainer  "Jan Moringen <jmoringe@techfak.uni-bielefeld.de>"
-  :version     "0.1.0"
-  :license     "GPL3; see COPYING file for details."
+  :version     "0.2.0"
+  :license     "LLGPLv3; see COPYING file for details."
   :description "This system provides a convenient interface for
  manipulating XML data. It is inspired by the xmltio library."
   :depends-on  (:alexandria
@@ -84,16 +84,16 @@
 			      (:file       "macros"
 			       :depends-on ("package" "protocol")))))
 
-  :in-order-to ((test-op (test-op :cxml-location-test))))
+  :in-order-to ((test-op (test-op :xml.location-test))))
 
-(defsystem :cxml-location-test
+(defsystem :xml.location-test
   :author      "Jan Moringen <jmoringe@techfak.uni-bielefeld.de>"
   :maintainer  "Jan Moringen <jmoringe@techfak.uni-bielefeld.de>"
   :version     "0.1.0"
-  :license     "GPL3; see COPYING file for details."
-  :description "Unit tests for the cxml-location system."
-  :depends-on  (:cxml-location
-		:lift
+  :license     "LLGPLv3; see COPYING file for details."
+  :description "Unit tests for the xml.location system."
+  :depends-on  ((:version :xml.location "0.2.0")
+		(:version :lift         "1.7.1")
 
 		:local-time
 		#.(if (find-system :lisplab nil)
@@ -129,32 +129,7 @@
 				    '(:file       "lisplab"
 				      :depends-on ("package"))
 				    (values))
-			      )))
-  :in-order-to ((test-op (load-op :cxml-location-test))))
+			      ))))
 
-(defmethod perform ((this test-op) (component (eql (find-system :cxml-location-test))))
+(defmethod perform ((this test-op) (component (eql (find-system :xml.location-test))))
   (funcall (find-symbol "RUN-TESTS" :lift) :config :generic))
-
-#+asdf-system-connections
-(defsystem-connection :cxml-location-and-local-time
-  :author      "Jan Moringen <jmoringe@techfak.uni-bielefeld.de>"
-  :maintainer  "Jan Moringen <jmoringe@techfak.uni-bielefeld.de>"
-  :version     "0.1.0"
-  :license     "GPL3; see COPYING file for details."
-  :description "To and from XML conversion for local-time timestamps."
-  :requires    (cxml-location
-	        local-time)
-  :components  ((:file       "local-time"
-		 :pathname   "src/local-time")))
-
-#+asdf-system-connections
-(defsystem-connection :cxml-location-and-lisplab
-  :author      "Jan Moringen <jmoringe@techfak.uni-bielefeld.de>"
-  :maintainer  "Jan Moringen <jmoringe@techfak.uni-bielefeld.de>"
-  :version     "0.1.0"
-  :license     "GPL3; see COPYING file for details."
-  :description "To and from XML conversion for matrices."
-  :requires    (cxml-location
-	        lisplab)
-  :components  ((:file       "lisplab"
-		 :pathname   "src/lisplab")))

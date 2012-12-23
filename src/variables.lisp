@@ -1,4 +1,4 @@
-;;; variables.lisp --- Variables used in the cxml-location system.
+;;; variables.lisp --- Variables used in the xml.location system.
 ;;
 ;; Copyright (C) 2011, 2012 Jan Moringen
 ;;
@@ -17,7 +17,7 @@
 ;; You should have received a copy of the GNU General Public License
 ;; along with this program. If not, see <http://www.gnu.org/licenses>.
 
-(cl:in-package #:cxml-location)
+(cl:in-package #:xml.location)
 
 (defparameter *cl-namespaces*
   '(&default ("cl" . "http://common-lisp.net"))
