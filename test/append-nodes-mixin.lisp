@@ -1,6 +1,6 @@
 ;;; append-nodes-mixin.lisp --- Unit tests for the append-nodes-mixin class.
 ;;
-;; Copyright (C) 2011 Jan Moringen
+;; Copyright (C) 2011, 2012 Jan Moringen
 ;;
 ;; Author: Jan Moringen <jmoringe@techfak.uni-bielefeld.de>
 ;;
@@ -17,7 +17,7 @@
 ;; You should have received a copy of the GNU General Public License
 ;; along with this program. If not, see <http://www.gnu.org/licenses>.
 
-(in-package :cxml-location.test)
+(cl:in-package #:cxml-location.test)
 
 (deftestsuite append-nodes-mixin-root (root)
   ((m1 #md((1 2)))

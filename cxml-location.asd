@@ -17,17 +17,12 @@
 ;; You should have received a copy of the GNU General Public License
 ;; along with this program. If not, see <http://www.gnu.org/licenses>.
 
-(cl:in-package :cl-user)
-
-(when (asdf:find-system :asdf-system-connections)
-  (asdf:load-system :asdf-system-connections))
-
-(defpackage :cxml-location-system
+(cl:defpackage #:cxml-location-system
   (:use
-   :cl
-  :asdf))
+   #:cl
+   #:asdf))
 
-(in-package :cxml-location-system)
+(cl:in-package #:cxml-location-system)
 
 (defsystem :cxml-location
   :author      "Jan Moringen <jmoringe@techfak.uni-bielefeld.de>"
@@ -41,8 +36,10 @@
 		:iterate
 		:let-plus
 		:closer-mop
+
 		:cxml-stp
 		:xpath
+
 		:cl-dynamic-classes)
   :components  ((:module     "src"
 		 :components ((:file       "package")
@@ -86,6 +83,7 @@
 					    "ignore-empty-results-mixin"))
 			      (:file       "macros"
 			       :depends-on ("package" "protocol")))))
+
   :in-order-to ((test-op (test-op :cxml-location-test))))
 
 (defsystem :cxml-location-test

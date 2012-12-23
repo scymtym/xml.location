@@ -17,104 +17,102 @@
 ;; You should have received a copy of the GNU General Public License
 ;; along with this program. If not, see <http://www.gnu.org/licenses>.
 
-(in-package :cl-user)
-
-(defpackage :cxml-location
+(cl:defpackage #:cxml-location
   (:nicknames
-   :xloc)
+   #:xloc)
 
   (:use
-   :cl
-   :alexandria
-   :split-sequence
-   :iterate
-   :let-plus
+   #:cl
+   #:alexandria
+   #:split-sequence
+   #:iterate
+   #:let-plus
 
-   :dynamic-classes)
+   #:dynamic-classes)
 
   ;; Special Symbols and variables
   (:export
-   :&default
-   :*cl-namespaces*)
+   #:&default
+   #:*cl-namespaces*)
 
   ;; Conditions
   (:export
-   :location-error
-   :location-error-document
-   :location-error-path
+   #:location-error
+   #:location-error-document
+   #:location-error-path
 
-   :missing-xpath-source
+   #:missing-xpath-source
 
-   :result-set-error-mixin
-   :location-error-result-set
+   #:result-set-error-mixin
+   #:location-error-result-set
 
-   :empty-result-set
+   #:empty-result-set
 
-   :too-many-matches-in-result-set
+   #:too-many-matches-in-result-set
 
-   :invalid-binding-form
-   :invalid-binding-form-form
+   #:invalid-binding-form
+   #:invalid-binding-form-form
 
-   :no-such-accessor-form
-   :invalid-binding-form-spec
-   :invalid-binding-form-name
+   #:no-such-accessor-form
+   #:invalid-binding-form-spec
+   #:invalid-binding-form-name
 
-   :xpath-creation-error
-   :xpath-creation-error-location
-   :xpath-creation-error-type
-   :xpath-creation-error-name
-   :xpath-creation-error-predicate
+   #:xpath-creation-error
+   #:xpath-creation-error-location
+   #:xpath-creation-error-type
+   #:xpath-creation-error-name
+   #:xpath-creation-error-predicate
 
-   :conversion-error
-   :conversion-error-value
-   :conversion-error-type
+   #:conversion-error
+   #:conversion-error-value
+   #:conversion-error-type
 
-   :no-conversion-method-mixin
-   :conversion-error-function
+   #:no-conversion-method-mixin
+   #:conversion-error-function
 
-   :xml->-conversion-error
+   #:xml->-conversion-error
 
-   :no-xml->-conversion-method
+   #:no-xml->-conversion-method
 
-   :->xml-conversion-error
-   :conversion-error-destination
+   #:->xml-conversion-error
+   #:conversion-error-destination
 
-   :no-->xml-conversion-method)
+   #:no-->xml-conversion-method)
 
   ;; Location Protocol
   (:export
-   :location-document
-   :location-namespaces
-   :location-path
-   :location-result
-   :name :val :@)
+   #:location-document
+   #:location-namespaces
+   #:location-path
+   #:location-result
+   #:name #:val #:@)
 
   ;; Dynamic Location Classes
   (:export
-   :make-location-class
-   :ensure-location-class
-   :location-classes)
+   #:make-location-class
+   #:ensure-location-class
+   #:location-classes)
 
   ;; Location Construction Protocol
   (:export
-   :loc)
+   #:loc)
 
   ;; Conversion Protocol
   (:export
-   :xml-> :->xml)
+   #:xml-> #:->xml)
 
   ;; Location Classes
   (:export
-   :location
-   :singleton-location
-   :multi-location
-   :create-missing-nodes-mixin
-   :ignore-empty-results-mixin
-   :append-nodes-mixin)
+   #:location
+   #:singleton-location
+   #:multi-location
+   #:create-missing-nodes-mixin
+   #:ignore-empty-results-mixin
+   #:append-nodes-mixin)
 
   ;; Macros
   (:export
-   :with-locations :with-locations-r/o)
+   #:with-locations #:with-locations-r/o)
 
   (:documentation
    "This package contains the public interface of the cmxl-location
