@@ -72,6 +72,37 @@ have a name")
    #'(lambda (node) (->xml new-value node type))
    (location-result location)))
 
+(defmethod (setf val) ((new-value list)
+		       (location  multi-location)
+		       &key
+		       (type :any))
+  (let* ((xpath::*dynamic-namespaces* (slot-value location 'namespaces))
+	 (nodes      (xpath:all-nodes (location-result location)))
+	 (old-length (length nodes))
+	 (new-length (length new-value)))
+    (iter (generate node in nodes)
+	  (generate value in new-value)
+	  (for i :from 0 :below (max old-length new-length))
+	  (cond
+	    ;; i-th child is beyond new number of children => delete
+	    ;; it
+	    ((>= i new-length)
+	     (let ((node (next node)))
+	       (stp:delete-child node (stp:parent node))))
+
+	    ;; i-th child did exist previously => just store the new
+	    ;; value.
+	    ((< i old-length)
+	     (collect (->xml (next value) (next node) type)))
+
+	    ;; i-th child did not exist previously => create it and
+	    ;; store the value.
+	    (t
+	     (let ((new-node (first (create-xpath-sibling
+				     (location-document location)
+				     (location-path location)))))
+	       (collect (->xml (next value) new-node type))))))))
+
 (defmethod @ ((location multi-location)
 	      (name     string)
 	      &key

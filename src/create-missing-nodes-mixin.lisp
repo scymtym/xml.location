@@ -41,12 +41,20 @@ classes."))
 			       uri)
   ;; When the requested attribute NAME is missing, create it with an
   ;; empty value.
-  (let ((item (location-result location)))
-    (or (apply #'stp:find-attribute-named item name
-	       (when uri `(,uri)))
-	(let ((attribute
-	       (apply #'stp:make-attribute ""
-		      (if uri (concatenate 'string "foo:" name) name)
-		      (when uri `(,uri)))))
-	  (stp:add-attribute item attribute)
-	  attribute))))
+  (let+ (((&accessors-r/o (result location-result)) location)
+	 ((&flet do-one (item)
+	    ;; If the attribute exists, just use it, otherwise create
+	    ;; it.
+	    (or (apply #'stp:find-attribute-named item name
+		       (when uri (list uri)))
+		(let ((attribute
+			(apply #'stp:make-attribute ""
+			       (if uri (concatenate 'string "foo:" name) name) ;; TODO
+			       (when uri (list uri)))))
+		  (stp:add-attribute item attribute)
+		  attribute)))))
+    (typecase result
+      (xpath:node-set
+       (xpath:map-node-set->list #'do-one result))
+      (t
+       (do-one result)))))

@@ -260,9 +260,9 @@ found."
 ;; Case 1 methods
 
 (defmethod ->xml ((value t) (dest stp:text) (type t)
-		  &key &allow-other-keys)
+		  &key inner-types &allow-other-keys)
   "Convert VALUE to string and store in DEST."
-  (setf (stp:data dest) (->xml value 'string type))
+  (setf (stp:data dest) (->xml value 'string (cons type inner-types)))
   value)
 
 (defmethod ->xml ((value string) (dest stp:text) (type t)
@@ -303,10 +303,12 @@ XPath if you intended to write an element's text.~@:>"
   value)
 
 (defmethod ->xml ((value sequence) (dest (eql 'string)) (type t)
-		  &key &allow-other-keys)
+		  &key inner-types &allow-other-keys)
   "Convert sequence VALUE to string by `format'ting."
   (with-standard-io-syntax
-    (format nil "~{~S~^ ~}" (coerce value 'list))))
+    (if (and (eq type 'list) (equal inner-types '(string)))
+	(format nil "~{~A~^ ~}" (coerce value 'list))
+	(format nil "~{~S~^ ~}" (coerce value 'list)))))
 
 (defmethod ->xml ((value list) (dest (eql 'string)) (type (eql 'type))
 		  &key &allow-other-keys)

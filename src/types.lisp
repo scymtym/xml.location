@@ -19,11 +19,6 @@
 
 (cl:in-package #:xml.location)
 
-(deftype list-of-length (length &optional (element-type t))
-  "A list of LENGTH with elements of type ELEMENT-TYPE or t when
-ELEMENT-TYPE IS not supplied."
-  (%list-of-length length element-type))
-
 (deftype if-no-match-policy-designator ()
   `(member :error :do-nothing :create))
 
@@ -32,13 +27,3 @@ ELEMENT-TYPE IS not supplied."
 
 (deftype assign-mode-designator ()
   `(member :replace :append))
-
-
-;;; Utility functions
-;;
-
-(defun %list-of-length (length element-type)
-  (if (zerop length)
-      'null
-      `(cons ,element-type
-	     ,(%list-of-length (1- length) element-type))))

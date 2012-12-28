@@ -72,7 +72,8 @@ IF-NO-MATCH."
   "Compute a location class based on the values of IF-MULTIPLE-MATCHES
 and IF-NO-MATCH. This is a separate function to make it usable in
 compiler macros."
-  (let ((mixins))
+  (let ((mixins)
+	(args/rest args))
 
     ;; Assign mode
     (ecase assign-mode
@@ -81,7 +82,7 @@ compiler macros."
        (pushnew 'append-nodes-mixin mixins) ;; ensure precedence
        (setf if-multiple-matches :all))
       (:replace))
-    (remove-from-plistf args :assign-mode)
+    (remove-from-plistf args/rest :assign-mode)
 
     ;; Multiple matches policy
     (ecase if-multiple-matches
@@ -89,15 +90,16 @@ compiler macros."
        (pushnew 'singleton-location mixins))
       (:all
        (pushnew 'multi-location mixins)
-       (remove-from-plistf args :if-multiple-matches :if-no-match)))
+       (remove-from-plistf args/rest :if-multiple-matches :if-no-match)))
 
     ;; No match policy
     (ecase if-no-match
       (:create
-       (pushnew 'create-missing-nodes-mixin mixins))
+       (unless (eq assign-mode :append)
+	 (pushnew 'create-missing-nodes-mixin mixins)))
       (:do-nothing
        (pushnew 'ignore-empty-result-mixin mixins))
       (:error))
 
     ;; Return the class and initargs
-    (values (ensure-location-class mixins) args)))
+    (values (ensure-location-class mixins) args/rest)))
