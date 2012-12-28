@@ -20,8 +20,7 @@
 (cl:in-package #:xml.location.test)
 
 (deftestsuite append-nodes-mixin-root (root)
-  ((m1 #md((1 2)))
-   (m2 #md((3 4))))
+  ()
   (:documentation
    "Unit tests for the `append-nodes-mixin' mixin class."))
 
@@ -34,25 +33,8 @@
 		  :assign-mode :append)))
     (setf (val loc) "hello"
 	  (val loc) " world")
-    (ensure-same
-     (first (val loc :type 'string)) "hello world"
-     :test #'string=))
-
-  (let* ((loc   (loc "<foo/>" "foo/bar"
-		:assign-mode :append))
-	 (value (progn
-		  (setf (val loc) m1
-			(val loc) m2)
-		  (val loc :type 'lisplab:matrix-base))))
-    (ensure-same
-     (length value) 2
-     :test #'=)
-    (ensure-same
-     (first value) m1
-     :test #'lisplab:.=)
-    (ensure-same
-     (second value) m2
-     :test #'lisplab:.=)))
+    (ensure-same (first (val loc :type 'string)) "hello world"
+		 :test #'string=)))
 
 (addtest (append-nodes-mixin-root
           :documentation
@@ -60,27 +42,22 @@
 case of multiple matches.")
   multiple-matches
 
-  (let* ((loc   (loc "<foo><bar/><bar/></foo>" "foo/bar/baz"
+  ;; Note that the specifies XPath matches both "bar" elements and
+  ;; that M1 and M2 will consequently be stored at both locations,
+  ;; yielding a total of four stored objects: two copies of M1 and two
+  ;; copies of M2.
+  (let* ((m1 (make-instance 'mock-domain-object :content 1))
+	 (m2 (make-instance 'mock-domain-object :content 2))
+	 (loc   (loc "<foo><bar/><bar/></foo>" "foo/bar/baz"
 		     :assign-mode :append))
 	 (value (progn
 		  (setf (val loc) m1
 			(val loc) m2)
-		  (val loc :type 'lisplab:matrix-base))))
-    (setf (val loc) m1
-	  (val loc) m2)
-
-    (ensure-same
-     (length value) 4
-     :test #'=)
-    (ensure-same
-     (first value) m1
-     :test #'lisplab:.=)
-    (ensure-same
-     (second value) m2
-     :test #'lisplab:.=)
-    (ensure-same
-     (third value) m1
-     :test #'lisplab:.=)
-    (ensure-same
-     (fourth value) m2
-     :test #'lisplab:.=)))
+		  (val loc :type 'mock-domain-object))))
+    (ensure-same value (list m1 m2 m1 m2)
+		 :test (lambda (left right)
+			 (and (length= left right)
+			      (every #'(lambda (left right)
+					 (= (mock-domain-object-content left)
+					    (mock-domain-object-content right)))
+				     left right))))))

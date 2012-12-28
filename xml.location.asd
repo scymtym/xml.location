@@ -20,14 +20,43 @@
 (cl:defpackage #:xml.location-system
   (:use
    #:cl
-   #:asdf))
+   #:asdf)
+
+  (:export
+   #:version/list
+   #:version/string))
 
 (cl:in-package #:xml.location-system)
+
+
+;;; Version stuff
+;;
+
+(defparameter +version-major+ 0
+  "Major component of version number.")
+
+(defparameter +version-minor+ 2
+  "Minor component of version number.")
+
+(defparameter +version-revision+ 0
+  "Revision component of version number.")
+
+(defun version/list ()
+  "Return a version of the form (MAJOR MINOR REVISION)."
+  (list +version-major+ +version-minor+ +version-revision+))
+
+(defun version/string ()
+  "Return a version string of the form \"MAJOR.MINOR.REVISION\"."
+  (format nil "~{~A.~A.~A~}" (version/list)))
+
+
+;;; System definition
+;;
 
 (defsystem :xml.location
   :author      "Jan Moringen <jmoringe@techfak.uni-bielefeld.de>"
   :maintainer  "Jan Moringen <jmoringe@techfak.uni-bielefeld.de>"
-  :version     "0.2.0"
+  :version     #.(version/string)
   :license     "LLGPLv3; see COPYING file for details."
   :description "This system provides a convenient interface for
  manipulating XML data. It is inspired by the xmltio library."
@@ -89,17 +118,11 @@
 (defsystem :xml.location-test
   :author      "Jan Moringen <jmoringe@techfak.uni-bielefeld.de>"
   :maintainer  "Jan Moringen <jmoringe@techfak.uni-bielefeld.de>"
-  :version     "0.1.0"
+  :version     #.(version/string)
   :license     "LLGPLv3; see COPYING file for details."
   :description "Unit tests for the xml.location system."
-  :depends-on  ((:version :xml.location "0.2.0")
-		(:version :lift         "1.7.1")
-
-		:local-time
-		#.(if (find-system :lisplab nil)
-		      :lisplab
-		      (values))
-		)
+  :depends-on  ((:version :xml.location #.(version/string))
+		(:version :lift         "1.7.1"))
   :components  ((:module     "test"
 		 :components ((:file       "package")
 
@@ -117,19 +140,8 @@
 			       :depends-on ("package"))
 			      (:file       "ignore-empty-results-mixin"
 			       :depends-on ("package"))
-			      #.(if (find-system :lisplab nil)
-				    '(:file       "append-nodes-mixin"
-			              :depends-on ("package"))
-				    (values))
-
-			      (:file       "local-time"
-			       :depends-on ("package"))
-
-			      #.(if (find-system :lisplab nil)
-				    '(:file       "lisplab"
-				      :depends-on ("package"))
-				    (values))
-			      ))))
+			      (:file       "append-nodes-mixin"
+			       :depends-on ("package"))))))
 
 (defmethod perform ((this test-op) (component (eql (find-system :xml.location-test))))
   (funcall (find-symbol "RUN-TESTS" :lift) :config :generic))

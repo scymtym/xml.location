@@ -89,3 +89,21 @@ matrices.")
     (ensure-condition 'xml->-conversion-error
       (let ((loc (loc doc xpath)))
 	(val loc :type type)))))
+
+(addtest (lisplab-root
+          :documentation
+	  "Test appending behavior of ->xml conversion for lisplab
+matrices.")
+  append
+
+  (let* ((m1    (first matrices))
+	 (m2    (second matrices))
+	 (loc   (loc "<foo/>" "foo/bar"
+		     :assign-mode :append))
+	 (value (progn
+		  (setf (val loc) m1
+			(val loc) m2)
+		  (val loc :type 'lisplab:matrix-base))))
+    (ensure-same (length value) 2  :test #'=)
+    (ensure-same (first value)  m1 :test #'lisplab:.=)
+    (ensure-same (second value) m2 :test #'lisplab:.=)))
