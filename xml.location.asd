@@ -67,10 +67,12 @@
 		:closer-mop
 
 		:cxml-stp
-		:xpath
+		:xpath)
+  :components  ((:file       "compat"
+		 :pathname   "src/compat")
 
-		:cl-dynamic-classes)
-  :components  ((:module     "src"
+		(:module     "src"
+		 :depends-on ("compat")
 		 :components ((:file       "package")
 			      (:file       "types"
 			       :depends-on ("package"))

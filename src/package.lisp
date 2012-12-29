@@ -26,9 +26,10 @@
    #:alexandria
    #:split-sequence
    #:iterate
-   #:let-plus
+   #:let-plus)
 
-   #:dynamic-classes)
+  (:import-from #:xml.location.compat
+   #:define-dynamic-class-family)
 
   ;; Special Symbols and variables
   (:export
