@@ -1,0 +1,130 @@
+#+TITLE:  xml.location README
+#+AUTHOR: Jan Moringen
+#+EMAIL:  jmoringe@techfak.uni-bielefeld.de
+
+* Introduction
+  The =xml.location= system provides manipulation of and a conversion
+  mechanisms for XML data:
+  + Typed, XPath-based location bindings
+  + Extensible Lisp -> XML and XML -> Lisp conversion
+  + Creation of XPath-specified XML structures
+  + Automatic compile-time parsing of XML documents and XPaths
+
+  This means, when working with an XML document
+#+BEGIN_SRC xml
+<root foo="1 2 3">old text</root>
+#+END_SRC
+we can write
+#+BEGIN_SRC lisp
+(let ((document (cxml:parse "<root foo=\"1 2 3\">old text</root>" (stp:make-builder))))
+  (with-locations (((:name name)                          "node()")
+                   (text                                  "node()/text()")
+                   ((:@ (foo "foo") :type '(list number)) "node()"))       document
+    (setf text "new text"
+          foo  '(4 5))
+    (values name text foo (stp:serialize document (cxml:make-string-sink)))))
+=>
+(values
+ "root"
+ "new text"
+ (1 2 3)
+ "<?xml version=\"1.0\" encoding=\"UTF-8\"?>
+<root foo=\"4 5\">new text</root>")
+#+END_SRC
+* Tutorial
+  The simplest case of using =xml.location= looks like this:
+#+BEGIN_SRC lisp -n
+(let ((loc (xml.location:loc "<foo a='1' b='c d'>bar baz</foo>" "node()")))
+  (values
+   (xml.location:name loc)
+   (xml.location:@    loc "a" :type 'integer)
+   (xml.location:@    loc "b" :type '(list symbol))))
+=> (values "foo" 1 (C D))
+#+END_SRC
+  The first line uses the =xml.location:loc= function to construct a
+  =xml.location:location= object for the document ~<foo a="1" b="c
+  d">bar baz</foo>~ and the XPath =node()=. In lines 3 -5, the
+  following things are extracted and returned as Lisp objects:
+  1. the name of the root node (using the =xml.location:name=
+     accessor)
+  2. the value of the attribute "a", interpreted as =integer= (using
+     the =xml.location:@= attribute accessor)
+  3. the value of the attribute "b", interpreted as =list= of =symbol=
+     s
+
+  The accessors =xml.location:name=, =xml.location:@= and
+  =xml.location:val= are =setf= able places:
+#+BEGIN_SRC lisp
+  (let ((loc (xml.location:loc "<foo old-attr='1'/>" "node()[@pred-attr='baz']"
+                                :if-no-match :create)))
+    (setf (xml.location:@ loc "old-attr" :type 'number) 2
+          (xml.location:@ loc "new-attr")               "foo")
+    loc)
+  => #<(LOCATION 3 MIXINS) node()[@pred-attr='baz'] in <foo new-attr="foo" pred-attr="baz" old-attr="2"/> {FAC7D81}>
+#+END_SRC
+  Note how =:if-no-match :create= causes specified locations to be
+  created if they do not exist already --- including things specified
+  in form of predicates in some cases.
+
+  In both previous examples, a single =xml.location:location= object
+  was used multiple times. Such cases can be simplified using the
+  =xml.location:with-locations-r/o= and =xml.location:with-locations=
+  macros. The former binds variables to values extracted from XML
+  locations while the latter uses symbol macros to make XML locations
+  =setf= able places:
+#+BEGIN_SRC lisp
+(xml.location:with-locations
+    (((:name name)                             "node()")
+     (text                                     "bla/text()")
+     ((:@ (my-foo "foo") :type '(list number)) "node()")
+     ((:@ bar)                                 "node()"))
+    "<bla foo='1 2 4' bar='baz'>foo</bla>"
+  ;; Set values of generalized variables
+  (setf name   "frooble"
+        my-foo '(5 6)
+        bar    42
+        text   "bubba")
+
+  ;; Extract values from generalized variables
+  (values name my-foo bar text))
+=> (values "frooble" (5 6) "42" "bubba")
+#+END_SRC
+* Conversion Infrastructure
+  The core of the conversion infrastructure consists of two
+  operations:
+  + Lisp -> XML conversion
+  + XML -> Lisp conversion
+  Actually, there are several details which lead to a greater number
+  of conversions, but all of these are special cases of the
+  aforementioned two conversions.
+** TODO Lisp to XML conversion
+** TODO XML to Lisp conversion
+** Adding Conversions
+   There are several possible ways to define to/from XML conversion
+   methods for a type:
+   1. Types that have obvious string representations
+   2. Types that require a structured representation
+   3. Types that require a structured representation and have internal
+      structure that can be represented in several different ways
+   Types of the first kind often work without the definition of
+   additional methods since the default behavior for to/from string
+   conversion uses =read= and =print= which is often sufficient.
+
+   For the second kind of type, at least the following two methods
+   have to be defined:
+#+BEGIN_SRC lisp
+  (defmethod ->xml ((value MY-TYPE)
+                    (dest  stp:element)
+                    (type  t))
+    "Store VALUE in XML element DEST."
+    ;; actual conversion code
+    )
+
+  (defmethod xml-> ((value stp:element)
+                    (type  'MY-TYPE))
+    "Retrieve an instance of MY-TYPE from the XML element VALUE."
+    ;; actual conversion code
+    )
+#+END_SRC
+
+* TODO Reference
