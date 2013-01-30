@@ -73,7 +73,7 @@ out on the node or nodes of the node set."))
 
 (defmethod (setf location-namespaces) :after ((new-value t)
 					      (location  location))
-  "Reset computed result of LOCATION when the path is changed."
+  "Reset computed result of LOCATION when namespaces are changed."
   (compile! location))
 
 (defmethod (setf location-path) :after ((new-value t)
@@ -83,7 +83,8 @@ out on the node or nodes of the node set."))
 
 (defmethod (setf location-compiled-path) :after  ((new-value t)
 						  (location  location))
-  "Reset computed result of LOCATION when the path is changed."
+  "Reset computed result of LOCATION when the compiled path is
+changed."
   (evaluate! location))
 
 (defmethod location-attribute :around ((location location)
