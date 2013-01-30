@@ -47,23 +47,35 @@ example, when the namespace table of a location is changed."))
 ;;; Result-set-related Errors
 ;;
 
-(define-condition result-set-error-mixin (condition)
-  ((result-set :initarg  :result-set
-	       :type     xpath:node-set
-	       :reader   location-error-result-set
-	       :documentation
-	       "The invalid result set."))
+(define-condition result-condition (condition)
+  ((result :initarg  :result
+	   :reader   result-condition-result
+	   :documentation
+	   "The invalid result."))
+  (:default-initargs
+   :result (missing-required-initarg 'result-condition :result))
+  (:documentation
+   "Subclasses of this condition are signaled when an XPath evaluation
+produces a result that is invalid in the a particular context."))
+
+(define-condition invalid-result-type (location-error
+				       result-condition)
+  ()
   (:report
    (lambda (condition stream)
-     (format stream "~@<The result set for XPath ~S on ~S is invalid~@:>"
+     (format stream "~@<The result ~S (of type ~S) for XPath ~S on ~S ~
+is invalid. Only XPaths yielding node sets are allowed.~@:>"
+	     (result-condition-result condition)
+	     (type-of (result-condition-result condition))
 	     (location-error-path condition)
 	     (%location-error-document-string condition))))
   (:documentation
    "This error is signaled when an XPath evaluation produces a result
-set that is invalid in its context."))
+which is not of the correct type for the context in which it
+occurs."))
 
 (define-condition empty-result-set (location-error
-				    result-set-error-mixin)
+				    result-condition)
   ()
   (:report
    (lambda (condition stream)
@@ -71,12 +83,14 @@ set that is invalid in its context."))
 but exactly one match is required~@:>"
 	     (location-error-path condition)
 	     (%location-error-document-string condition))))
+  (:default-initargs
+   :result nil)
   (:documentation
    "This error is signaled when an XPath evaluation produces an empty
 result in a context that requires a non-empty result set."))
 
 (define-condition too-many-matches-in-result-set (location-error
-						  result-set-error-mixin)
+						  result-condition)
   ((expected :initarg  :expected
 	     :type     non-negative-integer
 	     :reader   location-error-expected
@@ -87,7 +101,7 @@ had."))
    (lambda (condition stream)
      (format stream "~@<Too many matches (~A) in result set for XPatch ~
 ~S on ~S; exactly ~A match~:*~P is required~@:>"
-	     (length (xpath:all-nodes (location-error-result-set condition)))
+	     (length (xpath:all-nodes (result-condition-result condition)))
 	     (location-error-path condition)
 	     (%location-error-document-string condition)
 	     (location-error-expected condition))))
@@ -254,7 +268,7 @@ optional FORMAT-CONTROL and FORMAT-ARGUMENTS."
 					      no-conversion-method-mixin)
   ()
   (:default-initargs
-   :initform 'xml->)
+   :function 'xml->)
   (:report
    (lambda (condition stream)
      (format stream "~@<There is no method on ~S to convert the XML ~
@@ -305,7 +319,7 @@ DESTINATION and optional FORMAT-CONTROL and FORMAT-ARGUMENTS."
 					      no-conversion-method-mixin)
   ()
   (:default-initargs
-   :initform '->xml)
+   :function '->xml)
   (:report
    (lambda (condition stream)
      (format stream "~@<There is no method on ~S to store the value ~S ~

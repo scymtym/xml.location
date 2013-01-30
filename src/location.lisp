@@ -112,8 +112,15 @@ out on the node or nodes of the node set."))
 (defmethod evaluate! ((location location))
   "Evaluate the XPath on the document and store the resulting node
 set."
-  (with-slots (document compiled-path result) location
-    (setf result (xpath:evaluate-compiled compiled-path document))))
+  (let+ (((&slots document path compiled-path result) location)
+	 (result-candidate
+	  (xpath:evaluate-compiled compiled-path document)))
+    (unless (xpath:node-set-p result-candidate)
+      (error 'invalid-result-type
+	     :document document
+	     :path     path
+	     :result   result-candidate))
+    (setf result result-candidate)))
 
 (defmethod maybe-decode-qname ((location location)
 			       (name     string))

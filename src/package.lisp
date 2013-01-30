@@ -32,10 +32,12 @@
 
    #:missing-xpath-source
 
-   #:result-set-error-mixin
-   #:location-error-result-set
+   #:result-condition
+   #:result-condition-result
 
    #:empty-result-set
+
+   #:invalid-result-type
 
    #:too-many-matches-in-result-set
 
