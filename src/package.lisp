@@ -13,7 +13,8 @@
    #:alexandria
    #:split-sequence
    #:iterate
-   #:let-plus)
+   #:let-plus
+   #:more-conditions)
 
   (:import-from #:xml.location.compat
    #:define-dynamic-class-family)

@@ -51,6 +51,7 @@
 		:split-sequence
 		:iterate
 		:let-plus
+		:more-conditions
 		:closer-mop
 
 		:cxml-stp
@@ -132,5 +133,6 @@
 			      (:file       "append-nodes-mixin"
 			       :depends-on ("package"))))))
 
-(defmethod perform ((this test-op) (component (eql (find-system :xml.location-test))))
+(defmethod perform ((operation test-op)
+		    (component (eql (find-system :xml.location-test))))
   (funcall (find-symbol "RUN-TESTS" :lift) :config :generic))

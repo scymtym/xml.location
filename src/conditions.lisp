@@ -17,11 +17,15 @@
 	     :reader   location-error-path
 	     :documentation
 	     "The XPath of the location that caused the error."))
+  (:default-initargs
+   :document (missing-required-initarg 'location-error :document)
+   :path     (missing-required-initarg 'location-error :path))
   (:report
    (lambda (condition stream)
      (format stream "~@<An error involving the location described by~
 document ~A and XPATH ~A occurred.~@:>"
-	     (%location-error-document-string (location-error-document condition))
+	     (%location-error-document-string
+	      (location-error-document condition))
 	     (location-error-path condition))))
   (:documentation
    "This condition class can be used to discriminate location-related
@@ -157,17 +161,26 @@ creation of a node failed.")
 	      :documentation
 	      "The predicate of the XPath fragment for which the
 creation of a node failed."))
-  (:default-initargs :format-control   ""
-		     :format-arguments nil)
+  (:default-initargs
+   :location         (missing-required-initarg
+		      'xpath-creation-error :location)
+   :type             (missing-required-initarg
+		      'xpath-creation-error :type)
+   :name             (missing-required-initarg
+		      'xpath-creation-error :name)
+   :predicate        (missing-required-initarg
+		      'xpath-creation-error :predicate)
+   :format-control   ""
+   :format-arguments nil)
   (:report
    (lambda (condition stream)
      (format stream "~@<Could not create node for XPath fragment (~S ~
-~S ~S) at location ~A~@:>"
+~S ~S) at location ~A~/more-conditions::maybe-print-explanation/~@:>"
 	     (xpath-creation-error-type      condition)
 	     (xpath-creation-error-name      condition)
 	     (xpath-creation-error-predicate condition)
-	     (xpath-creation-error-location  condition))
-     (%maybe-add-explanation condition stream)))
+	     (xpath-creation-error-location  condition)
+	     condition)))
   (:documentation
    "This error is signaled when the creation of a node based on a
 XPath fragment fails."))
@@ -206,6 +219,9 @@ XPath fragment fails."))
 	     :documentation
 	     "The name of the conversion function for which no
 suitable method could be found."))
+  (:default-initargs
+   :function (missing-required-initarg
+	      'no-conversion-method-mixin :function))
   (:documentation
    "This condition class can be mixed into condition classes that
 indicate a conversion failure because of a missing conversion
@@ -216,10 +232,10 @@ method."))
   (:report
    (lambda (condition stream)
      (format stream "~@<The XML node ~S could not be converted into a ~
-Lisp object with type ~S~@:>"
+Lisp object with type ~S~/more-conditions::maybe-print-explanation/~@:>"
 	     (conversion-error-value condition)
-	     (conversion-error-type  condition))
-     (%maybe-add-explanation condition stream)))
+	     (conversion-error-type  condition)
+	     condition)))
   (:documentation
    "This error is signaled when converting an XML location into a Lisp
 object with a certain type fails."))
@@ -236,7 +252,9 @@ optional FORMAT-CONTROL and FORMAT-ARGUMENTS."
 
 (define-condition no-xml->-conversion-method (xml->-conversion-error
 					      no-conversion-method-mixin)
-  ((function :initform 'xml->))
+  ()
+  (:default-initargs
+   :initform 'xml->)
   (:report
    (lambda (condition stream)
      (format stream "~@<There is no method on ~S to convert the XML ~
@@ -256,14 +274,17 @@ XML location into a Lisp object with a certain type."))
 		:documentation
 		"The destination of the failed conversion. Usually an
 XML node."))
+  (:default-initargs
+   :destination (missing-required-initarg
+		 '->xml-conversion-error :destination))
   (:report
    (lambda (condition stream)
      (format stream "~@<The value ~S could not be stored in the ~
-destination ~S with type ~S~@:>"
+destination ~S with type ~S~/more-conditions::maybe-print-explanation/~@:>"
 	     (conversion-error-value       condition)
 	     (conversion-error-destination condition)
-	     (conversion-error-type        condition))
-     (%maybe-add-explanation condition stream)))
+	     (conversion-error-type        condition)
+	     condition)))
   (:documentation
    "This error is signaled when storing a value into an XML location
 with a certain type fails."))
@@ -282,7 +303,9 @@ DESTINATION and optional FORMAT-CONTROL and FORMAT-ARGUMENTS."
 
 (define-condition no-->xml-conversion-method (->xml-conversion-error
 					      no-conversion-method-mixin)
-  ((function :initform '->xml))
+  ()
+  (:default-initargs
+   :initform '->xml)
   (:report
    (lambda (condition stream)
      (format stream "~@<There is no method on ~S to store the value ~S ~
@@ -307,17 +330,6 @@ CONDITION."
     (stp:serialize
      (location-error-document condition)
      (cxml:make-character-stream-sink stream))))
-
-(defun %maybe-add-explanation (condition stream)
-  "If there is one, format the message contained in the
-`simple-condition' CONDITION on STREAM. Otherwise just add a colon."
-  (let ((control   (simple-condition-format-control   condition))
-	(arguments (simple-condition-format-arguments condition)))
-    (if (and control (not (emptyp control)))
-	(progn
-	  (format stream ": ~%")
-	  (apply #'format stream control arguments))
-	(write-char #\. stream))))
 
 (defun %add-available-conversion-methods (condition stream)
   "Print a list of methods of the generic function associated to
