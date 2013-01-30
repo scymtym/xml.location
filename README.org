@@ -27,7 +27,7 @@ we can write
 (values
  "root"
  "new text"
- (1 2 3)
+ (4 5)
  "<?xml version=\"1.0\" encoding=\"UTF-8\"?>
 <root foo=\"4 5\">new text</root>")
 #+END_SRC
