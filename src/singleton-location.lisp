@@ -4,7 +4,7 @@
 ;;;;
 ;;;; Author: Jan Moringen <jmoringe@techfak.uni-bielefeld.de>
 
-(cl:in-package :xml.location)
+(cl:in-package #:xml.location)
 
 (defclass singleton-location (location)
   ((if-no-match         :initarg  :if-no-match
