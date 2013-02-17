@@ -81,14 +81,9 @@
 					    "location"))
 			      (:file       "multi-location"
 			       :depends-on ("package" "location"))
-			      (:file       "create-missing-nodes-mixin"
+			      (:file       "location-mixins"
 			       :depends-on ("package" "xpath-creation"
 					    "location"))
-			      (:file       "ignore-empty-results-mixin"
-			       :depends-on ("package" "protocol"))
-			      (:file       "append-nodes-mixin"
-			       :depends-on ("package" "xpath-creation"
-					    "protocol"))
 
 			      (:file       "conversion"
 			       :depends-on ("package" "protocol"))
@@ -98,8 +93,8 @@
 					    "location"
 					    "singleton-location"
 					    "multi-location"
-					    "create-missing-nodes-mixin"
-					    "ignore-empty-results-mixin"))
+					    "location-mixins"))
+
 			      (:file       "macros"
 			       :depends-on ("package" "protocol")))))
 
@@ -126,11 +121,7 @@
 			      (:file       "macros"
 			       :depends-on ("package"))
 
-			      (:file       "create-missing-nodes-mixin"
-			       :depends-on ("package"))
-			      (:file       "ignore-empty-results-mixin"
-			       :depends-on ("package"))
-			      (:file       "append-nodes-mixin"
+			      (:file       "location-mixins"
 			       :depends-on ("package"))))))
 
 (defmethod perform ((operation test-op)
