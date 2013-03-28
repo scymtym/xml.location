@@ -11,14 +11,14 @@
 
 (cl:in-package #:xml.location-and-lisplab-system)
 
-#+maybe-later (progn
+#.(progn
     (load (merge-pathnames "xml.location.asd" *load-truename*))
     (values))
 
 (defsystem :xml.location-and-lisplab
   :author      "Jan Moringen <jmoringe@techfak.uni-bielefeld.de>"
   :maintainer  "Jan Moringen <jmoringe@techfak.uni-bielefeld.de>"
-  :version     "0.2.0" #+maybe-later (xml.location-system:version/string)
+  :version     #.(xml.location-system:version/string)
   :license     "LLGPLv3; see COPYING file for details."
   :description "To and from XML conversion for matrices."
   :depends-on  ((:version :xml.location #.(xml.location-system:version/string))
