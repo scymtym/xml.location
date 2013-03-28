@@ -125,14 +125,13 @@ set."
 using the configured namespaces of LOCATION. Return the components as
 multiple value. If NAME is not qualified, the secondary and tertiary
 values are both nil."
-  (let ((index (position #\: name)))
-    (if index
-        (let+ (((&slots-r/o namespaces) location)
-               (env (xpath::make-dynamic-environment namespaces))
-               ((&values local-name uri)
-                (xpath::decode-qname name env t)))
-          (values local-name (subseq name 0 index) uri))
-        (values name nil nil))))
+  (if-let ((index (position #\: name)))
+    (let+ (((&slots-r/o namespaces) location)
+           (env (xpath::make-dynamic-environment namespaces))
+           ((&values local-name uri)
+            (xpath::decode-qname name env t)))
+      (values local-name (subseq name 0 index) uri))
+    (values name nil nil)))
 
 (defmethod (setf name) :around ((new-value string)
                                 (location  location))
