@@ -7,7 +7,7 @@
 (cl:in-package #:xml.location)
 
 (defmacro with-locations ((&rest bindings-and-options) document
-			  &body body)
+                          &body body)
   "Execute body with certain variables, specified by BINDINGS bound to
 locations in DOCUMENT. DOCUMENT has to be of type
 `stp:document'.
@@ -39,45 +39,43 @@ XLOC> (xloc:with-locations-r/o
            (description-long                \"package/description/text()\")
            (author                           \"package/author/text()\")
            (dependencies                     \"package/depend/@package\"
-				       :if-multiple-matches :all)
+                                       :if-multiple-matches :all)
            (build-dependencies               \"package/rosbuild2/depend/@package\"
-				       :if-multiple-matches :all)
+                                       :if-multiple-matches :all)
            ((:val messages :type 'list)      \"package/rosbuild2/msgs/text()\")
            ((:val services :type 'list)      \"package/rosbuild2/srvs/text()\")) doc
         (values author messages))
 => \"Joe User\" '(\"msg/bla.msg\")"
   (once-only (document)
     (let+ (((&values bindings options)
-	    (%parse-bindings-and-options bindings-and-options))
-	   ((&values locations places)
-	    (%make-location-and-place-forms document bindings
-					    :global-args options
-					    :writable?   t)))
+            (%parse-bindings-and-options bindings-and-options))
+           ((&values locations places)
+            (%make-location-and-place-forms document bindings
+                                            :global-args options
+                                            :writable?   t)))
       `(let ,locations
-	 (symbol-macrolet ,places
-	   ,@body)))))
+         (symbol-macrolet ,places
+           ,@body)))))
 
 (defmacro with-locations-r/o ((&rest bindings-and-options) document
-			      &body body)
+                              &body body)
   "Like `with-locations', but binding places are not `setf'-able."
   (once-only (document)
     (let+ (((&values bindings options)
-	    (%parse-bindings-and-options bindings-and-options))
-	   ((&values locations places)
-	    (%make-location-and-place-forms document bindings
-					    :global-args options)))
+            (%parse-bindings-and-options bindings-and-options))
+           ((&values locations places)
+            (%make-location-and-place-forms document bindings
+                                            :global-args options)))
       `(let* (,@locations
-	      ,@places)
-	 ,@body))))
+              ,@places)
+         ,@body))))
 
-
 ;;; Location and Place Forms
-;;
 
 (defun %make-location-and-place-forms (document bindings
-				       &key
-				       global-args
-				       writable?)
+                                       &key
+                                       global-args
+                                       writable?)
   "Generate location and place forms for DOCUMENT and BINDINGS.
 When WRITABLE? is non-nil, locations are created in the document if
 necessary. Return two values:
@@ -85,41 +83,41 @@ necessary. Return two values:
 + A list of place forms"
   (let ((reusable-locations (make-hash-table :test #'equal)))
     (iter (for spec in bindings)
-	  (let+ (((access-spec &optional (path ".") &rest args) spec)
-		 ((&flet make-location-form ()
-		    (multiple-value-list
-		     (%make-location-form document path
-					  (append (when writable?
-						    `(:if-no-match :create))
-						  global-args
-						  args)))))
-		 (key (cons path args))
-		 ((location-var &optional location-form)
-		  (cond
-		    ;; If PATH is not constant, we have to emit a
-		    ;; separate location form.
-		    ((not (constantp path))
-		     (make-location-form))
-		    ;; Otherwise, we can try to look it up in the
-		    ;; table of reusable locations.
-		    ((butlast (gethash key reusable-locations)))
-		    ;; If there was no reusable location, we have to
-		    ;; create a new one and add it to the table.
-		    (t
-		     (setf (gethash key reusable-locations)
-			   (make-location-form)))))
-		 ((&values name access-form)
-		  (%parse-access-spec access-spec
-				      :location-var location-var)))
+          (let+ (((access-spec &optional (path ".") &rest args) spec)
+                 ((&flet make-location-form ()
+                    (multiple-value-list
+                     (%make-location-form document path
+                                          (append (when writable?
+                                                    `(:if-no-match :create))
+                                                  global-args
+                                                  args)))))
+                 (key (cons path args))
+                 ((location-var &optional location-form)
+                  (cond
+                    ;; If PATH is not constant, we have to emit a
+                    ;; separate location form.
+                    ((not (constantp path))
+                     (make-location-form))
+                    ;; Otherwise, we can try to look it up in the
+                    ;; table of reusable locations.
+                    ((butlast (gethash key reusable-locations)))
+                    ;; If there was no reusable location, we have to
+                    ;; create a new one and add it to the table.
+                    (t
+                     (setf (gethash key reusable-locations)
+                           (make-location-form)))))
+                 ((&values name access-form)
+                  (%parse-access-spec access-spec
+                                      :location-var location-var)))
 
-	    ;; Collect location construction form.
-	    (when location-form
-	      (collect location-form :into locations))
+            ;; Collect location construction form.
+            (when location-form
+              (collect location-form :into locations))
 
-	    ;; Collect symbol-macrolet form.
-	    (collect `(,name ,access-form) :into places))
+            ;; Collect symbol-macrolet form.
+            (collect `(,name ,access-form) :into places))
 
-	  (finally (return (values locations places))))))
+          (finally (return (values locations places))))))
 
 (defun %make-location-form (document path args)
   "Make a form that creates the `location' instance for DOCUMENT, PATH
@@ -133,119 +131,115 @@ and ARGS. Return two values:
      `(,location-var
        (loc ,document ,path ,@args)))))
 
-
 ;;; Access Spec Parser Methods
-;;
 
 (defgeneric %parse-access-spec (spec &rest args
-				&key &allow-other-keys))
+                                &key &allow-other-keys))
 
 (defmethod %parse-access-spec ((spec t)
-			       &key
-			       inner-specs)
+                               &key
+                               inner-specs)
   (%signal-no-such-accessor-form spec inner-specs))
 
 (defmethod %parse-access-spec ((spec (eql nil))
-			       &key
-			       inner-specs)
+                               &key
+                               inner-specs)
   (%signal-no-such-accessor-form spec inner-specs))
 
 (defmethod %parse-access-spec ((spec list)
-			       &rest args)
+                               &rest args)
   (if (not (symbolp (first spec)))
       (call-next-method)
       (apply #'%parse-access-spec
-	     (make-keyword (first spec))
-	     :inner-specs (rest spec)
-	     args)))
+             (make-keyword (first spec))
+             :inner-specs (rest spec)
+             args)))
 
 (defmethod %parse-access-spec ((spec symbol)
-			       &rest args)
+                               &rest args)
   (if (keywordp spec)
       (call-next-method)
       (apply #'%parse-access-spec :val
-	     :inner-specs `(,spec)
-	     args)))
+             :inner-specs `(,spec)
+             args)))
 
 (defmethod %parse-access-spec ((spec (eql :loc))
-			       &key
-			       location-var
-			       inner-specs)
+                               &key
+                               location-var
+                               inner-specs)
   (let+ (((name) inner-specs))
     (values name `(loc ,location-var "."))))
 
 (defmethod %parse-access-spec ((spec (eql :name))
-			       &key
-			       location-var
-			       inner-specs)
+                               &key
+                               location-var
+                               inner-specs)
   (let+ (((name &key prefix?) inner-specs))
     (values name
-	    `(name ,location-var ,@(when prefix? '((:prefix t)))))))
+            `(name ,location-var ,@(when prefix? '((:prefix t)))))))
 
 (defmethod %parse-access-spec ((spec (eql 'name))
-			       &rest args)
+                               &rest args)
   (apply #'%parse-access-spec :name args))
 
 (defmethod %parse-access-spec ((spec (eql :val))
-			       &key
-			       location-var
-			       inner-specs)
+                               &key
+                               location-var
+                               inner-specs)
   (let+ (((name &key type) inner-specs))
     (values name `(val ,location-var
-		       ,@(when type
-			   `(:type ,type))))))
+                       ,@(when type
+                           `(:type ,type))))))
 
 (defmethod %parse-access-spec ((spec (eql 'val))
-			       &rest args)
+                               &rest args)
   (apply #'%parse-access-spec :val args))
 
 (defmethod %parse-access-spec ((spec (eql :@))
-			       &key
-			       location-var
-			       inner-specs)
+                               &key
+                               location-var
+                               inner-specs)
   (let+ (((name-spec &key type) inner-specs)
-	 ((name attribute-name)
-	  (if (listp name-spec)
-	      name-spec
-	      (list name-spec
-		    (string-downcase (string name-spec))))))
+         ((name attribute-name)
+          (if (listp name-spec)
+              name-spec
+              (list name-spec
+                    (string-downcase (string name-spec))))))
     (values name `(@ ,location-var ,attribute-name
-				   ,@(when type
-				       `(:type ,type))))))
+                                   ,@(when type
+                                       `(:type ,type))))))
 
 (defmethod %parse-access-spec ((spec (eql '@))
-			       &rest args)
+                               &rest args)
   (apply #'%parse-access-spec :@ args))
 
-
 ;;; Utility Functions
-;;
 
 (defun %parse-bindings-and-options (bindings-and-options)
   "Separate BINDINGS-AND-OPTIONS into binding forms and
 options. Return two values: the collected binding forms and a plist
 containing the collected options."
   (iter (for  (binding-or-key binding-or-value) on bindings-and-options)
-	(with skip?)
-	(cond
-	  (skip?
-	   (setf skip? nil))
-	  ((listp binding-or-key)
-	   (collect binding-or-key :into bindings))
-	  ((keywordp binding-or-key)
-	   (unless binding-or-value
-	     (error 'invalid-binding-form
-		    :form binding-or-key))
-	   (collect binding-or-key   :into options)
-	   (collect binding-or-value :into options)
-	   (setf skip? t))
-	  (t
-	   (error 'invalid-binding-form
-		  :form binding-or-key)))
-	(finally (return (values bindings options)))))
+        (with skip?)
+        (cond
+          (skip?
+           (setf skip? nil))
+          ((listp binding-or-key)
+           (collect binding-or-key :into bindings))
+          ((keywordp binding-or-key)
+           (unless binding-or-value
+             (error 'invalid-binding-form
+                    :form binding-or-key))
+           (collect binding-or-key   :into options)
+           (collect binding-or-value :into options)
+           (setf skip? t))
+          (t
+           (error 'invalid-binding-form
+                  :form binding-or-key)))
+        (finally (return (values bindings options)))))
 
 (defun %signal-no-such-accessor-form (spec args)
   (error 'no-such-accessor-form
-	 :form `((,spec ,@args) "<path>")
-	 :spec `(,spec ,@args)
-	 :name spec))
+         :form `((,spec ,@args) "<path>")
+         :spec `(,spec ,@args)
+         :name spec))

@@ -7,12 +7,12 @@
 (cl:in-package #:xml.location)
 
 (defmethod loc ((document stp:node) (path string)
-		&rest args
-		&key
-		(if-multiple-matches :error)
-		(if-no-match         :error)
-		(assign-mode         :replace)
-		&allow-other-keys)
+                &rest args
+                &key
+                (if-multiple-matches :error)
+                (if-no-match         :error)
+                (assign-mode         :replace)
+                &allow-other-keys)
   "Create a location for DOCUMENT and PATH. The class of the location
 instance is determined based on the values of IF-MULTIPLE-MATCHES and
 IF-NO-MATCH."
@@ -22,45 +22,43 @@ IF-NO-MATCH."
   ;; Create the location instance
   (let+ (((&values class args) (apply #'%compute-location-class args)))
     (apply #'make-instance class
-	   :document document
-	   :path     path
-	   args)))
+           :document document
+           :path     path
+           args)))
 
 (defmethod loc ((document string) (path t)
-		&rest args)
+                &rest args)
   "Parse DOCUMENT as XML document before constructing the location."
   (let ((document (cxml:parse document (stp:make-builder))))
     (apply #'loc document path args)))
 
 (defmethod loc :around ((document t) (path function)
-			&rest args)
+                        &rest args)
   "Interpret PATH as compiled XPath, skipping the compilation step."
   (apply #'loc document nil :compiled-path path args))
 
-
 ;;; Utility Functions
-;;
 
 (declaim (ftype (function (&rest t
-			   &key
-			   (:if-multiple-matches if-multiple-matches-policy-designator)
-			   (:if-no-match         if-no-match-policy-designator)
-			   (:assign-mode         assign-mode-designator)
-			   &allow-other-keys)
-			  (values class list))
-		%compute-location-class))
+                           &key
+                           (:if-multiple-matches if-multiple-matches-policy-designator)
+                           (:if-no-match         if-no-match-policy-designator)
+                           (:assign-mode         assign-mode-designator)
+                           &allow-other-keys)
+                          (values class list))
+                %compute-location-class))
 
 (defun %compute-location-class (&rest args
-				&key
-				(if-multiple-matches :error)
-				(if-no-match         :error)
-				(assign-mode         :replace)
-				&allow-other-keys)
+                                &key
+                                (if-multiple-matches :error)
+                                (if-no-match         :error)
+                                (assign-mode         :replace)
+                                &allow-other-keys)
   "Compute a location class based on the values of IF-MULTIPLE-MATCHES
 and IF-NO-MATCH. This is a separate function to make it usable in
 compiler macros."
   (let ((mixins)
-	(args/rest args))
+        (args/rest args))
 
     ;; Assign mode
     (ecase assign-mode
@@ -83,7 +81,7 @@ compiler macros."
     (ecase if-no-match
       (:create
        (unless (eq assign-mode :append)
-	 (pushnew 'create-missing-nodes-mixin mixins)))
+         (pushnew 'create-missing-nodes-mixin mixins)))
       (:do-nothing
        (pushnew 'ignore-empty-result-mixin mixins))
       (:error))

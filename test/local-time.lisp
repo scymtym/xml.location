@@ -12,32 +12,32 @@
    (now-loc))
   (:setup
    (setf now-loc (loc (format nil "<foo ts='~S'/>" now)
-		      "node()/@ts")))
+                      "node()/@ts")))
   (:documentation
    "Unit tests for local-time XML conversions."))
 
 (addtest (local-time-root
           :documentation
-	  "Test case for ->xml conversion.")
+          "Test case for ->xml conversion.")
   ->xml
 
   (setf (val empty-loc) now)
   (ensure-same (val empty-loc)
-	       (format nil "~S" now)
-	       :test 'string=))
+               (format nil "~S" now)
+               :test 'string=))
 
 (addtest (local-time-root
           :documentation
-	  "Test case for xml-> conversion.")
+          "Test case for xml-> conversion.")
   xml->
 
   (ensure-same (val now-loc :type 'local-time:timestamp)
-	       now
-	       :test 'local-time:timestamp=))
+               now
+               :test 'local-time:timestamp=))
 
 (addtest (local-time-root
           :documentation
-	  "Test conditions signaled by local-time:timestamp
+          "Test conditions signaled by local-time:timestamp
 conversions.")
   conditions
 
@@ -48,7 +48,7 @@ conversions.")
   ;; For both directions
   (ensure-condition '->xml-conversion-error
     (setf (val empty-loc :type '(local-time:timestamp :some-inner-type))
-	  now))
+          now))
 
   ;; Two invalid timestamp values.
   (let ((loc (loc "<foo ts='invalid timestamp'/>" "node()/@ts")))

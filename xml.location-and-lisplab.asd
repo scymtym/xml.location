@@ -22,6 +22,6 @@
   :license     "LLGPLv3; see COPYING file for details."
   :description "To and from XML conversion for matrices."
   :depends-on  ((:version :xml.location #.(xml.location-system:version/string))
-	        :lisplab)
+                :lisplab)
   :components  ((:file       "lisplab"
-		 :pathname   "src/lisplab")))
+                 :pathname   "src/lisplab")))

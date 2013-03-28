@@ -6,14 +6,12 @@
 
 (cl:in-package #:xml.location)
 
-
 ;;; String locations
-;;
 
 (defmethod xml-> ((value string) (type (eql 'local-time:timestamp))
-		  &key
-		  inner-types
-		  &allow-other-keys)
+                  &key
+                  inner-types
+                  &allow-other-keys)
   "Deserialize timestamp from VALUE."
   (when inner-types
     (xml->-conversion-error
@@ -30,11 +28,11 @@ specified as inner types.~@:>"
 ;; we get the primary ->xml method for free via prin1ing in this case
 
 (defmethod ->xml :before  ((value local-time:timestamp)
-			   (dest  t)
-			   (type  (eql 'local-time:timestamp))
-			   &key
-			   inner-types
-			   &allow-other-keys)
+                           (dest  t)
+                           (type  (eql 'local-time:timestamp))
+                           &key
+                           inner-types
+                           &allow-other-keys)
   "Signal an error when INNER-TYPES are supplied."
   (when inner-types
     (->xml-conversion-error

@@ -6,24 +6,22 @@
 
 (cl:in-package #:xml.location)
 
-
 ;;; XML -> conversion
-;;
 
 (defmethod xml-> ((value stp:element)
-		  (type  lisplab:matrix-base)
-		  &key &allow-other-keys)
+                  (type  lisplab:matrix-base)
+                  &key &allow-other-keys)
   "Store matrix data in VALUE into the matrix instance TYPE. Signal an
 error if dimensions or element type are incompatible."
   (with-locations-r/o (((:@   rows         :type 'number)        ".")
-		       ((:@   cols         :type 'number)        ".")
-		       ((:@   element-type :type 'type)          ".")
-		       ((:val text         :type '(list number)) "text()[last()]"))
+                       ((:@   cols         :type 'number)        ".")
+                       ((:@   element-type :type 'type)          ".")
+                       ((:val text         :type '(list number)) "text()[last()]"))
       value
 
     ;; Check compatibility of dimensions.
     (unless (and (= (lisplab:rows type) rows)
-		 (= (lisplab:cols type) cols))
+                 (= (lisplab:cols type) cols))
       (xml->-conversion-error
        value type
        "~@<The stored matrix dimensions, ~D x ~D, do not match the ~
@@ -41,98 +39,94 @@ type ~S of the supplied destination matrix.~@:>"
     ;; Check number of matrix elements, import if ok.
     (let ((elements text))
       (unless (length= (the non-negative-integer (* rows cols))
-		       elements)
-	(xml->-conversion-error
-	 value type
-	 "~@<The number of stored elements, ~D, does not match the ~
+                       elements)
+        (xml->-conversion-error
+         value type
+         "~@<The number of stored elements, ~D, does not match the ~
 number of elements, ~D, of the supplied destination matrix.~@:>"
-	 (length elements) (* rows cols)))
+         (length elements) (* rows cols)))
 
       (lisplab:import-list type elements))
 
     type))
 
 (defmethod xml-> ((value stp:element)
-		  (type  (eql 'lisplab:matrix-base))
-		  &key
-		  inner-types
-		  matrix-class
-		  &allow-other-keys)
+                  (type  (eql 'lisplab:matrix-base))
+                  &key
+                  inner-types
+                  matrix-class
+                  &allow-other-keys)
   "Create a matrix from VALUE by extracting meta-data from attributes
 and reading elements from a text child node."
   (when (and inner-types matrix-class)
     (error "The keyword parameters ~S and ~S are mutually exclusive."
-	   :inner-types :matrix-class))
+           :inner-types :matrix-class))
 
   (with-locations-r/o (((:@ rows         :type 'number) ".")
-		       ((:@ cols         :type 'number) ".")
-		       ((:@ element-type :type 'type)   "."))
+                       ((:@ cols         :type 'number) ".")
+                       ((:@ element-type :type 'type)   "."))
       value
 
     (let* ((class  (or matrix-class
-		       (%element-type->matrix-class
-			(or (first inner-types) element-type))))
-	   (result (lisplab:mnew class 0 rows cols)))
+                       (%element-type->matrix-class
+                        (or (first inner-types) element-type))))
+           (result (lisplab:mnew class 0 rows cols)))
       (xml-> value result))))
 
 (macrolet ((define-matrix-xml->-method (class)
-	     `(defmethod xml-> ((value stp:element)
-				(type  (eql ',class))
-				&key
-				inner-types
-				&allow-other-keys)
-		(xml-> value 'lisplab:matrix-base
-		       :inner-types  inner-types
-		       :matrix-class ',class))))
+             `(defmethod xml-> ((value stp:element)
+                                (type  (eql ',class))
+                                &key
+                                inner-types
+                                &allow-other-keys)
+                (xml-> value 'lisplab:matrix-base
+                       :inner-types  inner-types
+                       :matrix-class ',class))))
   (define-matrix-xml->-method lisplab:matrix-dge)
   (define-matrix-xml->-method lisplab:matrix-zge)
   (define-matrix-xml->-method lisplab:matrix-ge))
 
-
 ;;; -> XML conversion
-;;
 
 (defmethod ->xml :before ((value lisplab:matrix-base)
-			  (dest  stp:element)
-			  (type  t)
-			  &key
-			  inner-types
-			  &allow-other-keys)
+                          (dest  stp:element)
+                          (type  t)
+                          &key
+                          inner-types
+                          &allow-other-keys)
   ;; When INNER-TYPES is supplied, make sure that the specified
   ;; element type is a subtype of the actual element type.
   (when inner-types
     (unless (subtypep (first inner-types)
-		      (lisplab:element-type value))
+                      (lisplab:element-type value))
       (error 'type-error
-	     :datum         (first inner-types)
-	     :expected-type (lisplab:element-type value)))))
+             :datum         (first inner-types)
+             :expected-type (lisplab:element-type value)))))
 
 (defmethod ->xml ((value lisplab:matrix-base)
-		  (dest  stp:element)
-		  (type  t)
-		  &key
-		  inner-types
-		  &allow-other-keys)
+                  (dest  stp:element)
+                  (type  t)
+                  &key
+                  inner-types
+                  &allow-other-keys)
   "Store the matrix VALUE into DEST by putting meta-data into
 attributes and using a text child node for the elements."
   (let ((element-type1 (or (first inner-types)
-			   (lisplab:element-type value))))
+                           (lisplab:element-type value))))
     (with-locations (((:@   rows         :type 'number) ".")
-		     ((:@   cols         :type 'number) ".")
-		     ((:@   element-type :type 'type)   ".")
-		     ((:val text         :type `(list ,element-type1))
-		                                        "text()"))
-	dest
+                     ((:@   cols         :type 'number) ".")
+                     ((:@   element-type :type 'type)   ".")
+                     ((:val text         :type `(list ,element-type1))
+                                                        "text()"))
+        dest
 
       (setf rows         (lisplab:rows value)
-	    cols         (lisplab:cols value)
-	    element-type element-type1
-	    text         (lisplab:export-list value))))
+            cols         (lisplab:cols value)
+            element-type element-type1
+            text         (lisplab:export-list value))))
   value)
 
-
 ;;; Utility functions
-;;
 
 (defun %element-type->matrix-class (element-type)
   "Map ELEMENT-TYPE to a matrix class with general structure and ffi

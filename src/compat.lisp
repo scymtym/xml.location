@@ -18,9 +18,7 @@
 
 (cl:in-package #:xml.location.compat)
 
-
 ;;; Types
-;;
 
 (deftype superclass-spec-simple ()
   "A simple superclass spec is a class name."
@@ -41,9 +39,7 @@ of direct superclasses."
        superclass-spec-start
        superclass-spec-end))
 
-
 ;;; Main macro
-;;
 
 (defmacro define-dynamic-class-family (name &rest doc-and-options)
   "Define a family of classes in the category NAME. Classes in the
@@ -83,101 +79,99 @@ type :dynamic-class-family."
   (check-type name symbol "a symbol")
 
   (let+ (;; Argument parsing
-	 ((doc
-	   &key
-	   (package            (package-name (symbol-package name)) package-supplied?)
-	   (metaclass          'standard-class)
-	   common-superclasses
-	   sort-mixins?
-	   (stripped-suffix    "-MIXIN"))
-	  (%parse-doc-and-options doc-and-options))
+         ((doc
+           &key
+           (package            (package-name (symbol-package name)) package-supplied?)
+           (metaclass          'standard-class)
+           common-superclasses
+           sort-mixins?
+           (stripped-suffix    "-MIXIN"))
+          (%parse-doc-and-options doc-and-options))
 
-	 ;;
-	 (metaclass (find-class metaclass))
-	 ((&values start-superclasses end-superclasses)
-	  (%process-superclass-specs common-superclasses))
+         ;;
+         (metaclass (find-class metaclass))
+         ((&values start-superclasses end-superclasses)
+          (%process-superclass-specs common-superclasses))
 
-	 ;; Maybe evaluate package
-	 (package (if package-supplied? (eval package) package))
+         ;; Maybe evaluate package
+         (package (if package-supplied? (eval package) package))
 
-	 ;; Name processing helpers
-	 ((&flet make-name (format)
-	    (intern (format nil format name) package)))
+         ;; Name processing helpers
+         ((&flet make-name (format)
+            (intern (format nil format name) package)))
 
-	 ;; Symbols
-	 (class-hash-name    (make-name "*~A-CLASSES*"))
-	 (make-class-name    (make-name "MAKE-~A-CLASS"))
-	 (ensure-class-name  (make-name "ENSURE-~A-CLASS"))
-	 (list-classes-name  (make-name "~A-CLASSES"))
-	 (clear-classes-name (make-name "CLEAR-~A-CLASSES!")))
+         ;; Symbols
+         (class-hash-name    (make-name "*~A-CLASSES*"))
+         (make-class-name    (make-name "MAKE-~A-CLASS"))
+         (ensure-class-name  (make-name "ENSURE-~A-CLASS"))
+         (list-classes-name  (make-name "~A-CLASSES"))
+         (clear-classes-name (make-name "CLEAR-~A-CLASSES!")))
     `(progn
        (defvar ,class-hash-name (make-hash-table :test 'equal)
-	 "Association of lists of mixins to previously created
+         "Association of lists of mixins to previously created
 classes.")
 
        (defgeneric ,make-class-name (mixins)
-	 (:method ((mixins list))
-	   (let+ (;; Name processing helpers
-		  ((&flet strip-suffix (name)
-		     (cond
-		       ((ends-with-subseq ,stripped-suffix name)
-			(subseq name 0 (- (length name) ,(length stripped-suffix))))
-		       (t name))))
-		  ((&flet short-class-name (class)
-		     (intern (strip-suffix (string (class-name class)))
-			     :keyword)))
-		  ((&flet full-class-name (superclasses)
-		     `(,,(intern (string name) :keyword)
-		       ,@(if (> (length superclasses) 2)
-			     `(,(length superclasses) :mixins)
-			     (mapcar #'short-class-name superclasses)))))
+         (:method ((mixins list))
+           (let+ (;; Name processing helpers
+                  ((&flet strip-suffix (name)
+                     (cond
+                       ((ends-with-subseq ,stripped-suffix name)
+                        (subseq name 0 (- (length name) ,(length stripped-suffix))))
+                       (t name))))
+                  ((&flet short-class-name (class)
+                     (intern (strip-suffix (string (class-name class)))
+                             :keyword)))
+                  ((&flet full-class-name (superclasses)
+                     `(,,(intern (string name) :keyword)
+                       ,@(if (> (length superclasses) 2)
+                             `(,(length superclasses) :mixins)
+                             (mapcar #'short-class-name superclasses)))))
 
-		  ;; Superclasses and class
-		  (superclasses (mapcar #'ensure-find-class
-					(append ,@(when start-superclasses
-						    `(',start-superclasses))
-						mixins
-						,@(when end-superclasses
-						    `(',end-superclasses)))))
-		  (class        (make-instance ,metaclass
-					       :name
-					       (full-class-name superclasses)
-					       :direct-superclasses
-					       superclasses)))
-	     class))
-	 (:documentation
-	  "Dynamically make a class composed of MIXINS."))
+                  ;; Superclasses and class
+                  (superclasses (mapcar #'ensure-find-class
+                                        (append ,@(when start-superclasses
+                                                    `(',start-superclasses))
+                                                mixins
+                                                ,@(when end-superclasses
+                                                    `(',end-superclasses)))))
+                  (class        (make-instance ,metaclass
+                                               :name
+                                               (full-class-name superclasses)
+                                               :direct-superclasses
+                                               superclasses)))
+             class))
+         (:documentation
+          "Dynamically make a class composed of MIXINS."))
 
        (defun ,ensure-class-name (mixins)
-	 "Find or make the dynamic class composed of MIXINS."
-	 (let ((key (,(if sort-mixins?
-			  '%make-key/sorted
-			  '%make-key/unsorted) mixins)))
-	   (ensure-gethash key ,class-hash-name (,make-class-name mixins))))
+         "Find or make the dynamic class composed of MIXINS."
+         (let ((key (,(if sort-mixins?
+                          '%make-key/sorted
+                          '%make-key/unsorted) mixins)))
+           (ensure-gethash key ,class-hash-name (,make-class-name mixins))))
 
        (defun ,clear-classes-name ()
-	 "Clear all previously defined dynamic classes."
-	 (clrhash ,class-hash-name))
+         "Clear all previously defined dynamic classes."
+         (clrhash ,class-hash-name))
 
        ;; Introspection and Documentation
        (defun ,list-classes-name ()
-	 "Return list of all classes in the family."
-	 (hash-table-values ,class-hash-name))
+         "Return list of all classes in the family."
+         (hash-table-values ,class-hash-name))
 
        ,@(when doc
-	   `((defmethod documentation ((thing (eql ',name))
-				       (type  (eql :dynamic-class-family)))
-	       (format nil "~@<~A ~_~:[[No known ~
+           `((defmethod documentation ((thing (eql ',name))
+                                       (type  (eql :dynamic-class-family)))
+               (format nil "~@<~A ~_~:[[No known ~
 classes]~;~:*Known classes: ~:@_~{+ ~S~^~_~}~]~@:>"
-		       ,doc (,list-classes-name)))))
+                       ,doc (,list-classes-name)))))
 
        ;; Return names of defined things
        (values ',make-class-name ',ensure-class-name
-	       ',clear-classes-name ',list-classes-name))))
+               ',clear-classes-name ',list-classes-name))))
 
-
 ;;; Utility functions
-;;
 
 ;; Note: used at runtime
 (defun ensure-find-class (class-or-name)
@@ -194,9 +188,9 @@ Return a list of the form
 \(DOC :NAME1 VALUE1 ...)
 in which DOC may be nil."
   (let+ (((doc options) (if (stringp (first doc-and-options))
-			    (list (first doc-and-options)
-				  (rest  doc-and-options))
-			    (list nil doc-and-options))))
+                            (list (first doc-and-options)
+                                  (rest  doc-and-options))
+                            (list nil doc-and-options))))
     `(,doc ,@(apply #'append options))))
 
 (defun %ensure-class-name (class-or-name)
@@ -222,16 +216,16 @@ list of direct superclasses."
   (check-type specs list "a list of superclass specifications")
 
   (let ((start)
-	(end))
+        (end))
     (dolist (spec specs)
       (typecase spec
-	(superclass-spec-simple
-	 (appendf end (list spec)))
-	(superclass-spec-start
-	 (appendf start (rest spec)))
-	(superclass-spec-end
-	 (appendf end (rest spec)))
-	(t
-	 (error 'invalid-superclass-spec
-		:spec spec))))
+        (superclass-spec-simple
+         (appendf end (list spec)))
+        (superclass-spec-start
+         (appendf start (rest spec)))
+        (superclass-spec-end
+         (appendf end (rest spec)))
+        (t
+         (error 'invalid-superclass-spec
+                :spec spec))))
     (values start end)))

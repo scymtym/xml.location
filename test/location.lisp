@@ -13,7 +13,7 @@
 
 (addtest (location-root
           :documentation
-	  "Smoke test for location class.")
+          "Smoke test for location class.")
   smoke
 
   (ensure (loc simple-document "bla/bli/text()"))
@@ -23,35 +23,35 @@
 
 (addtest (location-root
           :documentation
-	  "Test name accessor of the `singleton-location' class.")
+          "Test name accessor of the `singleton-location' class.")
   name
 
   (let ((loc (loc simple-document "/bla/bli"
-		  :namespaces '(&default ("foo" . "http://foo.org/bar")))))
+                  :namespaces '(&default ("foo" . "http://foo.org/bar")))))
     (ensure-same (name loc) "bli"
-		 :test #'string=)
+                 :test #'string=)
 
     (setf (name loc) "blup")
     (ensure-same (name loc) "blup"
-		 :test #'string=)
+                 :test #'string=)
 
     ;; A name with a colon should be treated as a qualified name.
     (setf (name loc) "foo:blup")
     (ensure-same (name loc) "blup"
-		 :test #'string=)
+                 :test #'string=)
     (ensure-same (name loc :prefix? t) "foo:blup"
-		 :test #'string=)
+                 :test #'string=)
 
     ;; A list of three strings should be treated as a qualified name.
     (setf (name loc) '("local" "prefix" "http://url.org/"))
     (ensure-same (name loc) "local"
-		 :test #'string=)
+                 :test #'string=)
     (ensure-same (name loc :prefix? t) "prefix:local"
-		 :test #'string=)))
+                 :test #'string=)))
 
 (addtest (location-root
           :documentation
-	  "Test attribute accessor of the `singleton-location'
+          "Test attribute accessor of the `singleton-location'
 class.")
   attribute
 
@@ -61,16 +61,16 @@ class.")
     (setf (@ loc "b") "6")
     (ensure-same (@ loc "b") "6")
 
-    (ensure-condition 'error ;;; TODO(jmoringe): proper condition
+    (ensure-condition 'error ; TODO(jmoringe): proper condition
       (@ loc "attribute-does-not-exist"))))
 
 (addtest (location-root
           :documentation
-	  "Test `loc' reader.")
+          "Test `loc' reader.")
   loc
 
   (let* ((loc   (loc "<foo><bar baz='bla'/></foo>" "node()"))
-	 (child (loc loc "bar")))
+         (child (loc loc "bar")))
     (ensure-same
      (name child) "bar"
      :test #'string=)
@@ -80,11 +80,11 @@ class.")
 
 (addtest (location-root
           :documentation
-	  "Test namespace handling in locations.")
+          "Test namespace handling in locations.")
   namespaces
 
   (let ((loc (loc "<bla/>" "node()"
-		  :namespaces '(&default ("fb" . "http://foo.org/bar")))))
+                  :namespaces '(&default ("fb" . "http://foo.org/bar")))))
     (ensure-same
      (location-namespaces loc)
      '((nil     . "")
@@ -94,21 +94,21 @@ class.")
      :test #'equal))
 
   (let ((loc (loc "<bla xmlns='http://foo.org/bar' xmlns:fb='http://foo.org/bar' a='1'><bli b='5'>umumum</bli><fb:bli/></bla>"
-		  "/fb:bla/fb:bli"
-		  :if-multiple-matches :all
-		  :namespaces '(&default ("fb" . "http://foo.org/bar")))))
+                  "/fb:bla/fb:bli"
+                  :if-multiple-matches :all
+                  :namespaces '(&default ("fb" . "http://foo.org/bar")))))
     (ensure-same (name loc)            '("bli" "bli"))
     (ensure-same (name loc :prefix? t) '("bli" "fb:bli")))
 
   (let ((loc (loc "<fb:bla xmlns:fb='http://foo.org/bar' a='1'><bli b='5'>umumum</bli><bli/></fb:bla>"
-		  "/fb:bla"
-		  :namespaces '(&default ("fb" . "http://foo.org/bar")))))
+                  "/fb:bla"
+                  :namespaces '(&default ("fb" . "http://foo.org/bar")))))
     (ensure-same (name loc)            "bla")
     (ensure-same (name loc :prefix? t) "fb:bla"))
 
   ;; Test setting the element's name to a qualified name.
   (let ((loc (loc "<bla/>" "node()"
-		  :namespaces '(&default ("foo" . "http://bar.bzr")))))
+                  :namespaces '(&default ("foo" . "http://bar.bzr")))))
     (setf (name loc) "foo:bar")
     (ensure-same
      (name loc :prefix? t) "foo:bar"

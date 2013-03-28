@@ -17,26 +17,26 @@
    (check-xml->-conversion (value type expected)
      (let ((result (xml-> value type)))
        (ensure-same
-	result expected
-	:test      #'equal
-	:report    "~@<`xml->' conversion of the value ~S to type ~S ~
+        result expected
+        :test      #'equal
+        :report    "~@<`xml->' conversion of the value ~S to type ~S ~
 produced ~S, not ~S.~@:>"
-	:arguments (value type result expected)))))
+        :arguments (value type result expected)))))
   (:documentation
    "Root test suite for from-XML conversion tests."))
 
 (addtest (xml->-root
           :documentation
-	  "Smoke test for from-XML conversion.")
+          "Smoke test for from-XML conversion.")
   smoke
 
   (ensure-cases (value type expected)
       '(("string"                 string        "string")
-	("5"                      real          5)
-	("5"                      (real)        5)
-	(":a :b"                  list          (":a" ":b"))
-	(":a :b"                  (list symbol) (:a :b))
-	("(COMPLEX DOUBLE-FLOAT)" type          (complex double-float)))
+        ("5"                      real          5)
+        ("5"                      (real)        5)
+        (":a :b"                  list          (":a" ":b"))
+        (":a :b"                  (list symbol) (:a :b))
+        ("(COMPLEX DOUBLE-FLOAT)" type          (complex double-float)))
     (check-xml->-conversion value                 type expected)
     (check-xml->-conversion (stp:make-text value) type expected)
     (check-xml->-conversion
@@ -44,7 +44,7 @@ produced ~S, not ~S.~@:>"
 
 (addtest (xml->-root
           :documentation
-	  "Test for conditions signaled by from-XML conversions.")
+          "Test for conditions signaled by from-XML conversions.")
   conditions
 
   ;; Generic error behavior
@@ -65,40 +65,40 @@ produced ~S, not ~S.~@:>"
    (check-->xml-conversion (value dest type expected)
      (let ((result (->xml value dest type)))
        (ensure-same
-	result expected
-	:test      #'equal
-	:report    "~@<`xml->' conversion of the value ~S to destination ~S ~
+        result expected
+        :test      #'equal
+        :report    "~@<`xml->' conversion of the value ~S to destination ~S ~
 with type ~S produced ~S, not ~S.~@:>"
-	:arguments (value dest type result expected)))))
+        :arguments (value dest type result expected)))))
   (:function
    (check-->xml-conversion-node (value dest type expected)
      (let ((result (->xml value dest type)))
        (ensure-same
-	result value
-	:test      #'equal
-	:report    "~@<`xml->' conversion of the value ~S to destination ~S ~
+        result value
+        :test      #'equal
+        :report    "~@<`xml->' conversion of the value ~S to destination ~S ~
 with type ~S returned ~S, not ~S.~@:>"
-	:arguments (value dest type result value))
+        :arguments (value dest type result value))
        (ensure-same
-	(stp:string-value dest) expected
-	:test      #'equal
-	:report    "~@<`xml->' conversion of the value ~S to destination ~S ~
+        (stp:string-value dest) expected
+        :test      #'equal
+        :report    "~@<`xml->' conversion of the value ~S to destination ~S ~
 with type ~S produced ~S, not ~S.~@:>"
-	:arguments (value dest type result expected)))))
+        :arguments (value dest type result expected)))))
   (:documentation
    "Root test suite for to-XML conversion tests."))
 
 (addtest (->xml-root
           :documentation
-	  "Smoke test for to-XML conversion.")
+          "Smoke test for to-XML conversion.")
   smoke
 
   (ensure-cases (value type expected)
       '(("string"               string "string")
-	(5                      string "5")
-	((":a" ":b")            string "\":a\" \":b\"")
-	((:a :b)                string ":A :B")
-	((complex double-float) type   "(COMPLEX DOUBLE-FLOAT)"))
+        (5                      string "5")
+        ((":a" ":b")            string "\":a\" \":b\"")
+        ((:a :b)                string ":A :B")
+        ((complex double-float) type   "(COMPLEX DOUBLE-FLOAT)"))
     (check-->xml-conversion value 'string type expected)
     (check-->xml-conversion-node
      value (stp:make-text "") type expected)
@@ -107,7 +107,7 @@ with type ~S produced ~S, not ~S.~@:>"
 
 (addtest (->xml-root
           :documentation
-	  "Test for conditions signaled by to-XML conversions.")
+          "Test for conditions signaled by to-XML conversions.")
   conditions
 
   ;; Generic error behavior

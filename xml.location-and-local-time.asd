@@ -22,6 +22,6 @@
   :license     "LLGPLv3; see COPYING file for details."
   :description "To and from XML conversion for local-time timestamps."
   :depends-on  ((:version :xml.location #.(xml.location-system:version/string))
-	        :local-time)
+                :local-time)
   :components  ((:file       "local-time"
-		 :pathname   "src/local-time")))
+                 :pathname   "src/local-time")))

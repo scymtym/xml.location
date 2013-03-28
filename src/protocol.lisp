@@ -37,7 +37,7 @@ a string."))
 LOCATION's associated XPath on LOCATION's associated document."))
 
 (defgeneric location-attribute (location name
-				&key &allow-other-keys)
+                                &key &allow-other-keys)
   (:documentation
    "Return the attribute(s) designated by NAME in LOCATION."))
 
@@ -58,8 +58,8 @@ multiple value. If NAME is not qualified, the secondary and tertiary
 values are both nil."))
 
 (defgeneric name (location
-		  &key
-		  prefix?)
+                  &key
+                  prefix?)
   (:documentation
    "Return the name of the node represented by LOCATION.
 If PREFIX? is non-nil, the concatenation of the prefix and the local
@@ -119,13 +119,13 @@ classes as its superclasses. Typical location mixin classes are:
 ;;; Location Construction Protocol
 
 (defgeneric loc (document path
-		 &rest args
-		 &key
-		 namespaces
-		 if-no-match
-		 if-multiple-matches
-		 assign-mode
-		 &allow-other-keys)
+                 &rest args
+                 &key
+                 namespaces
+                 if-no-match
+                 if-multiple-matches
+                 assign-mode
+                 &allow-other-keys)
   (:documentation
    "Construct and return a new location object that represents the
 nodes resulting from applying the XPath PATH to the XML document
@@ -208,15 +208,15 @@ arguments but is a sub-type of `location'."))
 ;;; which necessarily require some conversion.
 
 (defgeneric xml-> (value type
-		   &key
-		   inner-types)
+                   &key
+                   inner-types)
   (:documentation
    "Convert VALUE to the type designated by TYPE and, possibly
 INNER-TYPES. The result of the conversion is returned."))
 
 (defgeneric ->xml (value dest type
-		   &key
-		   inner-types)
+                   &key
+                   inner-types)
   (:documentation
    "Convert VALUE to a suitable type and store the result of the
 conversion in the XML node DEST. Should return VALUE."))
@@ -224,23 +224,23 @@ conversion in the XML node DEST. Should return VALUE."))
 ;; Default behavior of the conversion protocol
 
 (defmethod xml-> :around ((value t) (type t)
-			  &key
-			  inner-types)
+                          &key
+                          inner-types)
   (declare (ignore inner-types))
 
   (handler-bind
       (((and error (not xml->-conversion-error))
-	#'(lambda (condition)
-	    (xml->-conversion-error value type "~A" condition))))
+        #'(lambda (condition)
+            (xml->-conversion-error value type "~A" condition))))
     (call-next-method)))
 
 (defmethod ->xml :around ((value t) (dest t) (type t)
-			  &key
-			  inner-types)
+                          &key
+                          inner-types)
   (declare (ignore inner-types))
 
   (handler-bind
       (((and error (not ->xml-conversion-error))
-	#'(lambda (condition)
-	    (->xml-conversion-error value type dest "~A" condition))))
+        #'(lambda (condition)
+            (->xml-conversion-error value type dest "~A" condition))))
     (call-next-method)))
