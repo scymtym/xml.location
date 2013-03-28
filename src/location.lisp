@@ -88,7 +88,7 @@ changed."
                                        &rest args
                                        &key &allow-other-keys)
   "Handle qualified attribute names."
-  (let+ (((&values local-name nil uri)
+  (let+ (((&values local-name &ign uri)
           (maybe-decode-qname location name)))
     (if uri
         (apply #'call-next-method location local-name :uri uri args)

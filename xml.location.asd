@@ -46,7 +46,7 @@
   :depends-on  (:alexandria
                 :split-sequence
                 :iterate
-                :let-plus
+                (:version :let-plus "0.2")
                 :more-conditions
                 :closer-mop
 
