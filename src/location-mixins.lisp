@@ -81,7 +81,7 @@ classes."))
                        (when uri (list uri)))
                 (let ((attribute
                         (apply #'stp:make-attribute ""
-                               (if uri (concatenate 'string "foo:" name) name) ; TODO
+                               (concatenate 'string (if uri "foo:" "") name) ; TODO
                                (when uri (list uri)))))
                   (stp:add-attribute item attribute)
                   attribute)))))
