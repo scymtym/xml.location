@@ -1,29 +1,10 @@
 ;;;; xpath-creation.lisp --- XPath creation functions.
 ;;;;
-;;;; Copyright (C) 2011, 2012, 2013 Jan Moringen
+;;;; Copyright (C) 2011, 2012, 2013, 2015 Jan Moringen
 ;;;;
 ;;;; Author: Jan Moringen <jmoringe@techfak.uni-bielefeld.de>
 
 (cl:in-package #:xml.location)
-
-;;; XPath creation protocol
-
-(defgeneric create-xpath (document path)
-  (:documentation
-   "Ensure that the nodes referenced in PATH actually exist in
-DOCUMENT, creating them if necessary."))
-
-(defgeneric create-xpath-sibling (document path)
-  (:documentation
-   "Create a \"sibling\" path of PATH by duplicating the node
-designated by PATH and appending the result to the children of the
-parent of the node designated by PATH."))
-
-(defgeneric create-xpath-element (location type name predicate
-                                  &rest predicates)
-  (:documentation
-   "Create the XPath element designated by TYPE, NAME and PREDICATE in
-LOCATION."))
 
 ;;; Implementation
 
