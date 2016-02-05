@@ -28,17 +28,21 @@
   ;; Walk along XPath PATH in DOCUMENT, creating missing nodes as they
   ;; are encountered.
   (labels
-      ((one-step (location step &rest steps)
-         (let* ((result (xpath:evaluate
-                         `(xpath:xpath (:path ,step)) location))
-                (nodes  (if (xpath:node-set-empty-p result)
-                            (apply #'create-xpath-element
-                                   location (%expand-xpath-element step))
-                            (xpath:all-nodes result))))
-           (if steps
-               (mapcan #'(lambda (n) (apply #'one-step n steps)) nodes)
-               nodes))))
-    (apply #'one-step document (rest path))))
+      ((one-step (location path)
+         (etypecase path
+           ((cons (eql :path))
+            (let* ((step   (second path))
+                   (result (xpath:evaluate `(xpath:xpath (:path ,step)) location))
+                   (nodes  (if (xpath:node-set-empty-p result)
+                               (apply #'create-xpath-element
+                                      location (%expand-xpath-element step))
+                               (xpath:all-nodes result))))
+              (if-let ((rest (nthcdr 2 path)))
+                (mapcan (rcurry #'one-step `(:path ,@rest)) nodes)
+                nodes)))
+           ((cons keyword) ; function call
+            (one-step location (second path))))))
+    (one-step document path)))
 
 (defmethod create-xpath-sibling ((document stp:node) (path string))
   ;; Parse XPath and process parsed representation.
@@ -54,8 +58,8 @@
                        (list document)))
          (final    (lastcar path))
          (expanded (%expand-xpath-element final)))
-    (mapcan #'(lambda (parent)
-                (apply #'create-xpath-element parent expanded))
+    (mapcan (lambda (parent)
+              (apply #'create-xpath-element parent expanded))
             parents)))
 
 ;;; `create-xpath-element'

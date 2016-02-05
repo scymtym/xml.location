@@ -34,6 +34,9 @@
         ;; Predicates.
         (,(stp:make-element "root") "bar[@foo=\"bar\"]")
 
+        ;; Functions.
+        (,(stp:make-element "root") "union(bar)")
+
         ;; Some invalid cases.
         (,(stp:make-element "root") "bar[2]"            xpath-creation-error))
 
