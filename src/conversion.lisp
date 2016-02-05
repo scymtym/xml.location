@@ -1,6 +1,6 @@
 ;;;; conversion.lisp --- To and from XML conversions for some data types.
 ;;;;
-;;;; Copyright (C) 2011, 2012, 2013 Jan Moringen
+;;;; Copyright (C) 2011, 2012, 2013, 2014 Jan Moringen
 ;;;;
 ;;;; Author: Jan Moringen <jmoringe@techfak.uni-bielefeld.de>
 
@@ -17,7 +17,7 @@
 ;;;
 ;;;    a) A `read'able representation of the value has been stored
 ;;;       In this case, the conversion to the final type just uses
-;;;       `read'.
+;;;       `read-from-string'.
 ;;;
 ;;;    b) A conversion method has to be written
 ;;;       Such a conversion method can be written like this:
