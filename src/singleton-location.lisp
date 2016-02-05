@@ -1,6 +1,6 @@
 ;;;; singleton-location.lisp --- A location that corresponds to a single node.
 ;;;;
-;;;; Copyright (C) 2011, 2012, 2013 Jan Moringen
+;;;; Copyright (C) 2011, 2012, 2013, 2014, 2015 Jan Moringen
 ;;;;
 ;;;; Author: Jan Moringen <jmoringe@techfak.uni-bielefeld.de>
 
@@ -29,6 +29,9 @@ XPath that produces exactly one match in the document."))
          (result-set (call-next-method)))
 
     (cond
+      ((not (xpath:node-set-p result-set))
+       (setf result result-set))
+
       ;; Apply no-match policy. Note that :create is implemented in a
       ;; mixin class and thus does not have to be handled here.
       ((xpath:node-set-empty-p result-set)
@@ -124,7 +127,12 @@ location that already represents an attribute node?")))
 (defmethod location-attribute ((location singleton-location)
                                (name     string)
                                &key
-                               (uri ""))
+                               (uri "")
+                               (if-does-not-exist #'error))
   (let ((item (location-result location)))
     (or (stp:find-attribute-named item name uri)
-        (error "No attribute ~S at location ~A" name item))))
+        (cond
+          ((null if-does-not-exist)
+           nil)
+          ((member if-does-not-exist `(error ,#'error))
+           (error "No attribute ~S at location ~A" name item))))))

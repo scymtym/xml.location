@@ -1,6 +1,6 @@
 ;;;; multi-location.lisp ---
 ;;;;
-;;;; Copyright (C) 2011, 2012, 2013 Jan Moringen
+;;;; Copyright (C) 2011, 2012, 2013, 2014 Jan Moringen
 ;;;;
 ;;;; Author: Jan Moringen <jmoringe@techfak.uni-bielefeld.de>
 
@@ -114,13 +114,18 @@ have a name")
 (defmethod location-attribute ((location multi-location)
                                (name     string)
                                &key
-                               uri)
+                               uri
+                               (if-does-not-exist #'error))
   (flet ((find-attribute (item)
            (check-type item stp:element "an element node (and thus
 does not have attribute children). Did you try to use `@' or `(setf
 @)' on a location that already represents an attribute node?")
            (or (apply #'stp:find-attribute-named item name
                       (when uri `(,uri)))
-               (error "No attribute ~S at location ~A" name item))))
+               (cond
+                 ((null if-does-not-exist)
+                  nil)
+                 ((member if-does-not-exist `(error ,#'error))
+                  (error "No attribute ~S at location ~A" name item))))))
     (xpath:map-node-set->list #'find-attribute
                               (location-result location))))
