@@ -1,6 +1,6 @@
 ;;;; macros.lisp --- Convenience macros for the xml.location system.
 ;;;;
-;;;; Copyright (C) 2011, 2012, 2013 Jan Moringen
+;;;; Copyright (C) 2011, 2012, 2013, 2014 Jan Moringen
 ;;;;
 ;;;; Author: Jan Moringen <jmoringe@techfak.uni-bielefeld.de>
 
@@ -53,7 +53,7 @@ XLOC> (xloc:with-locations-r/o
             (%make-location-and-place-forms document bindings
                                             :global-args options
                                             :writable?   t)))
-      `(let ,locations
+      `(let+ ,locations
          (symbol-macrolet ,places
            ,@body)))))
 
@@ -66,9 +66,9 @@ XLOC> (xloc:with-locations-r/o
            ((&values locations places)
             (%make-location-and-place-forms document bindings
                                             :global-args options)))
-      `(let* (,@locations
-              ,@places)
-         ,@body))))
+      `(let ,locations
+         (let+ ,places
+           ,@body)))))
 
 ;;; Location and Place Forms
 
@@ -84,14 +84,16 @@ necessary. Return two values:
   (let ((reusable-locations (make-hash-table :test #'equal)))
     (iter (for spec in bindings)
           (let+ (((access-spec &optional (path ".") &rest args) spec)
+                 (effective-args (append (when writable?
+                                           `(:if-no-match :create))
+                                         global-args
+                                         args))
                  ((&flet make-location-form ()
                     (multiple-value-list
-                     (%make-location-form document path
-                                          (append (when writable?
-                                                    `(:if-no-match :create))
-                                                  global-args
-                                                  args)))))
-                 (key (cons path args))
+                     (%make-location-form document path effective-args))))
+                 ((&values name access-form effective-args)
+                  (%parse-access-spec access-spec :args effective-args))
+                 (key (cons path effective-args))
                  ((location-var &optional location-form)
                   (cond
                     ;; If PATH is not constant, we have to emit a
@@ -105,17 +107,14 @@ necessary. Return two values:
                     ;; create a new one and add it to the table.
                     (t
                      (setf (gethash key reusable-locations)
-                           (make-location-form)))))
-                 ((&values name access-form)
-                  (%parse-access-spec access-spec
-                                      :location-var location-var)))
+                           (make-location-form))))))
 
             ;; Collect location construction form.
             (when location-form
               (collect location-form :into locations))
 
             ;; Collect symbol-macrolet form.
-            (collect `(,name ,access-form) :into places))
+            (collect `(,name ,(funcall access-form location-var)) :into places))
 
           (finally (return (values locations places))))))
 
@@ -126,10 +125,8 @@ and ARGS. Return two values:
 + a form that should be evaluated to compute the location instance or
   nil, if a location variable emitted earlier can be reused."
   (let ((location-var (gensym "LOCATION")))
-    (values
-     location-var
-     `(,location-var
-       (loc ,document ,path ,@args)))))
+    (values location-var `(,location-var
+                           (loc ,document ,path ,@args)))))
 
 ;;; Access Spec Parser Methods
 
@@ -165,18 +162,18 @@ and ARGS. Return two values:
 
 (defmethod %parse-access-spec ((spec (eql :loc))
                                &key
-                               location-var
-                               inner-specs)
+                               inner-specs
+                               args)
   (let+ (((name) inner-specs))
-    (values name `(loc ,location-var "."))))
+    (values name (lambda (location-var) `(loc ,location-var "."))  args)))
 
 (defmethod %parse-access-spec ((spec (eql :name))
                                &key
-                               location-var
-                               inner-specs)
+                               inner-specs
+                               args)
   (let+ (((name &key prefix?) inner-specs))
-    (values name
-            `(name ,location-var ,@(when prefix? '((:prefix t)))))))
+    (values name (lambda (location-var)
+                   `(name ,location-var ,@(when prefix? '((:prefix t))))) args)))
 
 (defmethod %parse-access-spec ((spec (eql 'name))
                                &rest args)
@@ -184,12 +181,11 @@ and ARGS. Return two values:
 
 (defmethod %parse-access-spec ((spec (eql :val))
                                &key
-                               location-var
-                               inner-specs)
+                               inner-specs
+                               args)
   (let+ (((name &key type) inner-specs))
-    (values name `(val ,location-var
-                       ,@(when type
-                           `(:type ,type))))))
+    (values name (lambda (location-var)
+                   `(val ,location-var ,@(when type `(:type ,type)))) args)))
 
 (defmethod %parse-access-spec ((spec (eql 'val))
                                &rest args)
@@ -197,17 +193,24 @@ and ARGS. Return two values:
 
 (defmethod %parse-access-spec ((spec (eql :@))
                                &key
-                               location-var
-                               inner-specs)
+                               inner-specs
+                               args)
   (let+ (((name-spec &key type) inner-specs)
-         ((name attribute-name)
-          (if (listp name-spec)
-              name-spec
-              (list name-spec
-                    (string-downcase (string name-spec))))))
-    (values name `(@ ,location-var ,attribute-name
-                                   ,@(when type
-                                       `(:type ,type))))))
+         ((&plist-r/o (if-no-match :if-no-match)) args)
+         ((name &optional (attribute-name (string-downcase name)))
+          (ensure-list name-spec)))
+    (values name
+            (lambda (location-var)
+              (if (eq if-no-match :do-nothing) ; TODO allow evaluation at runtime
+                  `(when (location-attribute ,location-var ,attribute-name
+                                             :if-does-not-exist nil)
+                     (@ ,location-var ,attribute-name
+                                        ,@(when type
+                                            `(:type ,type))))
+                  `(@ ,location-var ,attribute-name
+                                    ,@(when type
+                                        `(:type ,type)))))
+            (remove-from-plist args :if-no-match))))
 
 (defmethod %parse-access-spec ((spec (eql '@))
                                &rest args)
@@ -225,6 +228,9 @@ containing the collected options."
           (skip?
            (setf skip? nil))
           ((listp binding-or-key)
+           (unless (>= (length binding-or-key) 2)
+             (error 'invalid-binding-form
+                    :form binding-or-key))
            (collect binding-or-key :into bindings))
           ((keywordp binding-or-key)
            (unless binding-or-value
