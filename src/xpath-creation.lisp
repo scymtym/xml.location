@@ -1,10 +1,22 @@
 ;;;; xpath-creation.lisp --- XPath creation functions.
 ;;;;
-;;;; Copyright (C) 2011, 2012, 2013, 2015 Jan Moringen
+;;;; Copyright (C) 2011-2016 Jan Moringen
 ;;;;
 ;;;; Author: Jan Moringen <jmoringe@techfak.uni-bielefeld.de>
 
 (cl:in-package #:xml.location)
+
+;;; Utility functions
+
+(declaim (inline %expand-xpath-element))
+
+;;; When necessary, pad the list SPEC with nil elements such that its
+;;; length becomes 3.
+(defun %expand-xpath-element (spec)
+  (let ((missing (- 3 (length spec))))
+    (if (plusp missing)
+        (append spec (make-list missing))
+        spec)))
 
 ;;; Implementation
 
@@ -195,15 +207,3 @@ component list: ~S.~@:>"
   (let ((attribute (stp:make-attribute "" name)))
     (stp:add-attribute location attribute)
     (list attribute)))
-
-;;; Utility functions
-
-(declaim (inline %expand-xpath-element))
-
-(defun %expand-xpath-element (spec)
-  "When necessary, pad the list SPEC with nil elements such that its
-length becomes 3."
-  (let ((missing (- 3 (length spec))))
-    (if (plusp missing)
-        (append spec (make-list missing))
-        spec)))
