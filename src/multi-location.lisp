@@ -1,6 +1,6 @@
-;;;; multi-location.lisp ---
+;;;; multi-location.lisp --- A location corresponding to mulitple document locations.
 ;;;;
-;;;; Copyright (C) 2011, 2012, 2013, 2014 Jan Moringen
+;;;; Copyright (C) 2011-2016 Jan Moringen
 ;;;;
 ;;;; Author: Jan Moringen <jmoringe@techfak.uni-bielefeld.de>
 
@@ -28,7 +28,7 @@ have a name")
 (defmethod (setf name) ((new-value string)
                         (location  multi-location))
   (xpath:map-node-set->list
-   #'(lambda (item) (setf (stp:local-name item) new-value))
+   (lambda (item) (setf (stp:local-name item) new-value))
    (location-result location))
   new-value)
 
@@ -36,10 +36,10 @@ have a name")
                         (location  multi-location))
   (let+ (((local-name prefix uri) new-value))
     (xpath:map-node-set->list
-     #'(lambda (item)
-         (setf (stp:namespace-uri    item) uri
-               (stp:namespace-prefix item) prefix
-               (stp:local-name       item) local-name))
+     (lambda (item)
+       (setf (stp:namespace-uri    item) uri
+             (stp:namespace-prefix item) prefix
+             (stp:local-name       item) local-name))
      (location-result location)))
   new-value)
 
@@ -54,7 +54,7 @@ have a name")
                        &key
                        (type :any))
   (xpath:map-node-set->list
-   #'(lambda (node) (->xml new-value node type))
+   (lambda (node) (->xml new-value node type))
    (location-result location)))
 
 (defmethod (setf val) ((new-value list)
