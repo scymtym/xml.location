@@ -1,6 +1,6 @@
 ;;;; xml.location-and-lisplab.asd --- System definition for xml.location and lisplab interop.
 ;;;;
-;;;; Copyright (C) 2012, 2013 Jan Moringen
+;;;; Copyright (C) 2012, 2013, 2016 Jan Moringen
 ;;;;
 ;;;; Author: Jan Moringen <jmoringe@techfak.uni-bielefeld.de>
 
@@ -19,7 +19,7 @@
   :author      "Jan Moringen <jmoringe@techfak.uni-bielefeld.de>"
   :maintainer  "Jan Moringen <jmoringe@techfak.uni-bielefeld.de>"
   :version     #.(xml.location-system:version/string)
-  :license     "LLGPLv3; see COPYING file for details."
+  :license     "LLGPLv3" ; see COPYING file for details
   :description "To and from XML conversion for matrices."
   :depends-on  ((:version :xml.location #.(xml.location-system:version/string))
                 :lisplab)

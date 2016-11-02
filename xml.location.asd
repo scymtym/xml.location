@@ -40,7 +40,7 @@
   :author      "Jan Moringen <jmoringe@techfak.uni-bielefeld.de>"
   :maintainer  "Jan Moringen <jmoringe@techfak.uni-bielefeld.de>"
   :version     #.(version/string)
-  :license     "LLGPLv3; see COPYING file for details."
+  :license     "LLGPLv3" ; see COPYING file for details
   :description "This system provides a convenient interface for
  manipulating XML data. It is inspired by the xmltio library."
   :depends-on  (:alexandria
@@ -100,7 +100,7 @@
   :author      "Jan Moringen <jmoringe@techfak.uni-bielefeld.de>"
   :maintainer  "Jan Moringen <jmoringe@techfak.uni-bielefeld.de>"
   :version     #.(version/string)
-  :license     "LLGPLv3; see COPYING file for details."
+  :license     "LLGPLv3" ; see COPYING file for details
   :description "Unit tests for the xml.location system."
   :depends-on  ((:version :xml.location #.(version/string))
                 (:version :lift         "1.7.1"))
