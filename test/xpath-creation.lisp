@@ -29,7 +29,7 @@
 
         ;; Attribute creation.
         (,(stp:make-element "root") "@baz")
-        ;; TODO (,(stp:make-element "root") "@*")
+        (,(stp:make-element "root") "@*")
 
         ;; Predicates.
         (,(stp:make-element "root") "bar[@foo=\"bar\"]")

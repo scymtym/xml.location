@@ -197,13 +197,25 @@
                (first predicates) (rest predicates))
         children)))
 
-(defmethod create-xpath-element ((location  stp:element)
-                                 (type      (eql :attribute))
-                                 (name      string)
-                                 (predicate (eql nil))
-                                 &rest predicates)
-  ;; Create an attribute node at LOCATION.
-  (assert (null predicates))
-  (let ((attribute (stp:make-attribute "" name)))
-    (stp:add-attribute location attribute)
-    (list attribute)))
+(flet ((add-attribute (location name)
+         (let ((attribute (stp:make-attribute "" name)))
+           (stp:add-attribute location attribute)
+           (list attribute))))
+
+  (defmethod create-xpath-element ((location  stp:element)
+                                   (type      (eql :attribute))
+                                   (name      string)
+                                   (predicate (eql nil))
+                                   &rest predicates)
+    ;; Create an attribute node at LOCATION.
+    (assert (null predicates))
+    (add-attribute location name))
+
+  (defmethod create-xpath-element ((location  stp:element)
+                                   (type      (eql :attribute))
+                                   (name      (eql '*))
+                                   (predicate (eql nil))
+                                   &rest predicates)
+    ;; Create an attribute node at LOCATION.
+    (assert (null predicates))
+    (add-attribute location "someattribute")))
