@@ -57,42 +57,23 @@
 
                 (:module     "src"
                  :depends-on ("compat")
+                 :serial     t
                  :components ((:file       "package")
-                              (:file       "types"
-                               :depends-on ("package"))
-                              (:file       "conditions"
-                               :depends-on ("package"))
-                              (:file       "variables"
-                               :depends-on ("package"))
-                              (:file       "protocol"
-                               :depends-on ("package"))
-                              (:file       "xpath-creation"
-                               :depends-on ("package" "types"))
+                              (:file       "types")
+                              (:file       "conditions")
+                              (:file       "variables")
+                              (:file       "protocol")
+                              (:file       "xpath-creation")
 
-                              (:file       "location"
-                               :depends-on ("package" "conditions"
-                                            "protocol"))
-                              (:file       "singleton-location"
-                               :depends-on ("package" "types"
-                                            "location"))
-                              (:file       "multi-location"
-                               :depends-on ("package" "location"))
-                              (:file       "location-mixins"
-                               :depends-on ("package" "xpath-creation"
-                                            "location"))
+                              (:file       "location")
+                              (:file       "singleton-location")
+                              (:file       "multi-location")
+                              (:file       "location-mixins")
 
-                              (:file       "conversion"
-                               :depends-on ("package" "protocol"))
-                              (:file       "construction"
-                               :depends-on ("package" "types"
-                                            "conditions" "protocol"
-                                            "location"
-                                            "singleton-location"
-                                            "multi-location"
-                                            "location-mixins"))
+                              (:file       "conversion")
+                              (:file       "construction")
 
-                              (:file       "macros"
-                               :depends-on ("package" "protocol")))))
+                              (:file       "macros"))))
 
   :in-order-to ((test-op (test-op :xml.location-test))))
 
@@ -105,22 +86,17 @@
   :depends-on  ((:version :xml.location #.(version/string))
                 (:version :lift         "1.7.1"))
   :components  ((:module     "test"
+                 :serial     t
                  :components ((:file       "package")
-                              (:file       "xpath-creation"
-                               :depends-on ("package"))
+                              (:file       "xpath-creation")
 
-                              (:file       "location"
-                               :depends-on ("package"))
-                              (:file       "multi-location"
-                               :depends-on ("package"))
+                              (:file       "location")
+                              (:file       "multi-location")
 
-                              (:file       "conversion"
-                               :depends-on ("package"))
-                              (:file       "macros"
-                               :depends-on ("package"))
+                              (:file       "conversion")
+                              (:file       "macros")
 
-                              (:file       "location-mixins"
-                               :depends-on ("package"))))))
+                              (:file       "location-mixins")))))
 
 (defmethod perform ((operation test-op)
                     (component (eql (find-system :xml.location-test))))
