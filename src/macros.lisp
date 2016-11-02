@@ -1,6 +1,6 @@
 ;;;; macros.lisp --- Convenience macros for the xml.location system.
 ;;;;
-;;;; Copyright (C) 2011, 2012, 2013, 2014 Jan Moringen
+;;;; Copyright (C) 2011-2016 Jan Moringen
 ;;;;
 ;;;; Author: Jan Moringen <jmoringe@techfak.uni-bielefeld.de>
 
@@ -228,7 +228,7 @@ containing the collected options."
           (skip?
            (setf skip? nil))
           ((listp binding-or-key)
-           (unless (>= (length binding-or-key) 2)
+           (unless (>= (length binding-or-key) 1)
              (error 'invalid-binding-form
                     :form binding-or-key))
            (collect binding-or-key :into bindings))
