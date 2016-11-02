@@ -21,12 +21,12 @@
 ;;; Implementation
 
 (defmethod create-xpath ((document stp:node) (path string))
-  "Parse XPath and process parsed representation."
+  ;; Parse XPath and process parsed representation.
   (create-xpath document (xpath:parse-xpath path)))
 
 (defmethod create-xpath ((document stp:node) (path list))
-  "Walk along XPath PATH in DOCUMENT, creating missing nodes as they
-are encountered. "
+  ;; Walk along XPath PATH in DOCUMENT, creating missing nodes as they
+  ;; are encountered.
   (labels
       ((one-step (location step &rest steps)
          (let* ((result (xpath:evaluate
@@ -41,13 +41,13 @@ are encountered. "
     (apply #'one-step document (rest path))))
 
 (defmethod create-xpath-sibling ((document stp:node) (path string))
-  "Parse XPath and process parsed representation."
+  ;; Parse XPath and process parsed representation.
   (create-xpath-sibling document (xpath:parse-xpath path)))
 
 (defmethod create-xpath-sibling ((document stp:node) (path list))
-  "Potentially create XPath PATH in DOCUMENT except for the final
-element. Then unconditionally create a node matching the final element
-of PATH."
+  ;; Potentially create XPath PATH in DOCUMENT except for the final
+  ;; element. Then unconditionally create a node matching the final
+  ;; element of PATH.
   (let* ((butlast  (butlast (rest path)))
          (parents  (if butlast
                        (create-xpath document `(:path ,@butlast))
@@ -66,8 +66,8 @@ of PATH."
 
 (defmethod no-applicable-method ((fuction (eql (fdefinition 'create-xpath-element)))
                                  &rest args)
-  "Signal an error if no `create-xpath-element' method is
-applicable."
+  ;; Signal an error if no `create-xpath-element' method is
+  ;; applicable.
   (let+ (((location type name predicate) args))
     (error 'xpath-creation-error
            :location  location
@@ -107,9 +107,9 @@ applicable."
                                  (predicate integer)
                                  &rest predicates)
   (let ((children (create-xpath-element location type name nil)))
-   (if predicates
-       (apply #'create-xpath-element location type name predicates)
-       children)))
+    (if predicates
+        (apply #'create-xpath-element location type name predicates)
+        children)))
 
 (defmethod create-xpath-element :around ((location  stp:node)
                                          (type      (eql :child))
@@ -152,7 +152,7 @@ applicable."
              :name             name
              :predicate        predicate
              :format-control   "~@<Invalid marker in qualified name ~
-component list: ~S.~@:>"
+                                component list: ~S.~@:>"
              :format-arguments `(,marker)))
     (let ((child (stp:make-element
                   (concatenate 'string prefix ":" local-name)
@@ -165,7 +165,7 @@ component list: ~S.~@:>"
                                  (name      t)
                                  (predicate list)
                                  &rest predicates)
-  "Create a child node satisfying PREDICATE."
+  ;; Create a child node satisfying PREDICATE.
   (let+ (;; First check whether LOCATION exists but does not satisfy
          ;; PREDICATE. If it exists, use it, otherwise, create it.
          (result   (xpath:evaluate
@@ -202,7 +202,7 @@ component list: ~S.~@:>"
                                  (name      string)
                                  (predicate (eql nil))
                                  &rest predicates)
-  "Create an attribute node at LOCATION."
+  ;; Create an attribute node at LOCATION.
   (assert (null predicates))
   (let ((attribute (stp:make-attribute "" name)))
     (stp:add-attribute location attribute)
