@@ -1,6 +1,6 @@
 ;;;; xml.location.asd --- System definition of the xml.location system.
 ;;;;
-;;;; Copyright (C) 2011, 2012, 2013 Jan Moringen
+;;;; Copyright (C) 2011-2016 Jan Moringen
 ;;;;
 ;;;; Author: Jan Moringen <jmoringe@techfak.uni-bielefeld.de>
 
@@ -106,6 +106,8 @@
                 (:version :lift         "1.7.1"))
   :components  ((:module     "test"
                  :components ((:file       "package")
+                              (:file       "xpath-creation"
+                               :depends-on ("package"))
 
                               (:file       "location"
                                :depends-on ("package"))

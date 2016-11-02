@@ -9,6 +9,7 @@
    #:cl
    #:alexandria
    #:iterate
+   #:let-plus
    #:lift
 
    #:xml.location)
