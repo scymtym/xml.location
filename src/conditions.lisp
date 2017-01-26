@@ -1,6 +1,6 @@
 ;;;; conditions.lisp --- Conditions used in the xml.location system.
 ;;;;
-;;;; Copyright (C) 2011, 2012, 2013 Jan Moringen
+;;;; Copyright (C) 2011-2017 Jan Moringen
 ;;;;
 ;;;; Author: Jan Moringen <jmoringe@techfak.uni-bielefeld.de>
 
@@ -220,7 +220,6 @@ XPath fragment fails."))
 (define-condition no-conversion-method-mixin (condition)
   ((function :initarg    :function
              :type       symbol
-             :allocation :class
              :reader     conversion-error-function
              :documentation
              "The name of the conversion function for which no
