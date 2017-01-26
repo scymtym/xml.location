@@ -7,39 +7,16 @@
 (cl:defpackage #:xml.location-system
   (:use
    #:cl
-   #:asdf)
-
-  (:export
-   #:version/list
-   #:version/string))
+   #:asdf))
 
 (cl:in-package #:xml.location-system)
-
-;;; Version stuff
-
-(defparameter +version-major+ 0
-  "Major component of version number.")
-
-(defparameter +version-minor+ 2
-  "Minor component of version number.")
-
-(defparameter +version-revision+ 0
-  "Revision component of version number.")
-
-(defun version/list ()
-  "Return a version of the form (MAJOR MINOR REVISION)."
-  (list +version-major+ +version-minor+ +version-revision+))
-
-(defun version/string ()
-  "Return a version string of the form \"MAJOR.MINOR.REVISION\"."
-  (format nil "~{~A.~A.~A~}" (version/list)))
 
 ;;; System definition
 
 (defsystem :xml.location
   :author      "Jan Moringen <jmoringe@techfak.uni-bielefeld.de>"
   :maintainer  "Jan Moringen <jmoringe@techfak.uni-bielefeld.de>"
-  :version     #.(version/string)
+  :version     (:read-file-form "version-string.sexp")
   :license     "LLGPLv3" ; see COPYING file for details
   :description "This system provides a convenient interface for
  manipulating XML data. It is inspired by the xmltio library."
@@ -80,10 +57,10 @@
 (defsystem :xml.location/test
   :author      "Jan Moringen <jmoringe@techfak.uni-bielefeld.de>"
   :maintainer  "Jan Moringen <jmoringe@techfak.uni-bielefeld.de>"
-  :version     #.(version/string)
+  :version     (:read-file-form "version-string.sexp")
   :license     "LLGPLv3" ; see COPYING file for details
   :description "Unit tests for the xml.location system."
-  :depends-on  ((:version :xml.location #.(version/string))
+  :depends-on  ((:version :xml.location (:read-file-form "version-string.sexp"))
                 (:version :lift         "1.7.1"))
   :components  ((:module     "test"
                  :serial     t
