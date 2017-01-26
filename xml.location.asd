@@ -1,6 +1,6 @@
 ;;;; xml.location.asd --- System definition of the xml.location system.
 ;;;;
-;;;; Copyright (C) 2011-2016 Jan Moringen
+;;;; Copyright (C) 2011-2017 Jan Moringen
 ;;;;
 ;;;; Author: Jan Moringen <jmoringe@techfak.uni-bielefeld.de>
 
@@ -75,9 +75,9 @@
 
                               (:file       "macros"))))
 
-  :in-order-to ((test-op (test-op :xml.location-test))))
+  :in-order-to ((test-op (test-op :xml.location/test))))
 
-(defsystem :xml.location-test
+(defsystem :xml.location/test
   :author      "Jan Moringen <jmoringe@techfak.uni-bielefeld.de>"
   :maintainer  "Jan Moringen <jmoringe@techfak.uni-bielefeld.de>"
   :version     #.(version/string)
@@ -99,5 +99,5 @@
                               (:file       "location-mixins")))))
 
 (defmethod perform ((operation test-op)
-                    (component (eql (find-system :xml.location-test))))
+                    (component (eql (find-system :xml.location/test))))
   (funcall (find-symbol "RUN-TESTS" :lift) :config :generic))
