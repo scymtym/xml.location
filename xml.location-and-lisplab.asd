@@ -4,13 +4,6 @@
 ;;;;
 ;;;; Author: Jan Moringen <jmoringe@techfak.uni-bielefeld.de>
 
-(cl:defpackage #:xml.location-and-lisplab-system
-  (:use
-   #:cl
-   #:asdf))
-
-(cl:in-package #:xml.location-and-lisplab-system)
-
 #.(progn
     (load (merge-pathnames "xml.location.asd" *load-truename*))
     (values))

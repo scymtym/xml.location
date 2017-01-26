@@ -4,15 +4,6 @@
 ;;;;
 ;;;; Author: Jan Moringen <jmoringe@techfak.uni-bielefeld.de>
 
-(cl:defpackage #:xml.location-system
-  (:use
-   #:cl
-   #:asdf))
-
-(cl:in-package #:xml.location-system)
-
-;;; System definition
-
 (defsystem :xml.location
   :author      "Jan Moringen <jmoringe@techfak.uni-bielefeld.de>"
   :maintainer  "Jan Moringen <jmoringe@techfak.uni-bielefeld.de>"
