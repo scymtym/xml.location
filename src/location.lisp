@@ -1,6 +1,6 @@
 ;;;; location.lisp --- Standard location class.
 ;;;;
-;;;; Copyright (C) 2011, 2012, 2013 Jan Moringen
+;;;; Copyright (C) 2011-2018 Jan Moringen
 ;;;;
 ;;;; Author: Jan Moringen <jmoringe@techfak.uni-bielefeld.de>
 
@@ -30,7 +30,9 @@ location.")
                   :documentation
                   "Compiled version of the XPath of the location.")
    (result        :initarg  :result
-                  :type     (or null xpath:node-set)
+                  ;; The `singleton-location' subclass stores
+                  ;; elements, not `node-set's.
+                  ;; :type     (or null xpath:node-set)
                   :reader   location-result
                   :initform nil
                   :documentation
