@@ -1,6 +1,6 @@
 ;;;; macros.lisp --- Unit tests for the `with-locations' macros.
 ;;;;
-;;;; Copyright (C) 2011, 2012, 2013 Jan Moringen
+;;;; Copyright (C) 2011-2020 Jan Moringen
 ;;;;
 ;;;; Author: Jan Moringen <jmoringe@techfak.uni-bielefeld.de>
 
@@ -50,6 +50,17 @@ foo:bar='foo.bar:bar' baz:bar='baz.doo:bar'/>"
                      stream :omit-xml-declaration-p t)))
    "<frooble foo=\"5 6\" bar=\"42\">bubba</frooble>"
    :test #'string=))
+
+(addtest (macros-root
+          :documentation
+          "Test the `:if-no-match' `:do-nothing' option to
+  `with-locations'.")
+  if-no-match-do-nothing
+
+  (let ((document (cxml:parse "<foo/>" (stp:make-builder))))
+    (with-locations-r/o (((:@ baz) "bar" :if-no-match :do-nothing))
+        document
+      (ensure-same baz nil))))
 
 (addtest (macros-root
           :documentation

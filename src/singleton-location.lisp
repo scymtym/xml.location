@@ -1,6 +1,6 @@
 ;;;; singleton-location.lisp --- A location that corresponds to a single node.
 ;;;;
-;;;; Copyright (C) 2011, 2012, 2013, 2014, 2015 Jan Moringen
+;;;; Copyright (C) 2011-2020 Jan Moringen
 ;;;;
 ;;;; Author: Jan Moringen <jmoringe@techfak.uni-bielefeld.de>
 
@@ -118,11 +118,17 @@ XPath that produces exactly one match in the document."))
 
 (defmethod location-attribute :before ((location singleton-location)
                                        (name     string)
-                                       &key &allow-other-keys)
+                                       &key
+                                       if-does-not-exist
+                                       &allow-other-keys)
   (let ((item (location-result location)))
-    (check-type item stp:element "an element node (and thus does not
-have attribute children). Did you try to use `@' or `(setf @)' on a
-location that already represents an attribute node?")))
+    (cond ((typep item 'stp:element))
+          ((null if-does-not-exist))
+          (t
+           (error "an element node (and thus does not have attribute ~
+                   children). Did you try to use `@' or `(setf @)' on ~
+                   a location that already represents an attribute ~
+                   node?")))))
 
 (defmethod location-attribute ((location singleton-location)
                                (name     string)
@@ -130,9 +136,8 @@ location that already represents an attribute node?")))
                                (uri "")
                                (if-does-not-exist #'error))
   (let ((item (location-result location)))
-    (or (stp:find-attribute-named item name uri)
-        (cond
+    (cond ((and item (stp:find-attribute-named item name uri)))
           ((null if-does-not-exist)
            nil)
           ((member if-does-not-exist `(error ,#'error))
-           (error "No attribute ~S at location ~A" name item))))))
+           (error "No attribute ~S at location ~A" name item)))))
